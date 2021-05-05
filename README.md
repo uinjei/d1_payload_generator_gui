@@ -1,10 +1,10 @@
-# d1_payload_generator_gui
+# D1 Payload Generator GUI
 
-A new Flutter project.
+Payload Generator GUI version.
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+Flutter Desktop Application
 
 A few resources to get you started if this is your first Flutter project:
 
