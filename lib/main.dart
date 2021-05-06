@@ -33,7 +33,7 @@ void main() {
   });
 }
 
-const borderColor = Color(0xFF7AD7F0);
+const borderColor = Color(0xFFBF40BF);
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.

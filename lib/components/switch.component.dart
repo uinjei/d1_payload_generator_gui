@@ -1,3 +1,4 @@
+import 'package:d1_payload_generator_gui/style.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
@@ -16,8 +17,9 @@ class CustomSwitch extends StatelessWidget {
       title: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label),
+          Text(label, style: whiteText,),
           Switch(
+            activeColor: Colors.purple,
             value: value,
             onChanged: (newValue) {
               onChanged(newValue);

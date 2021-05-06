@@ -1,7 +1,7 @@
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/widgets.dart';
 
-const sidebarColor = Color(0xFFB7E9F7);
+const sidebarColor = Color(0xFFBF40BF);
 
 class LeftSide extends StatelessWidget {
   @override

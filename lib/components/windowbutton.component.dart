@@ -3,11 +3,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 final buttonColors = WindowButtonColors(
-  iconNormal: Color(0xFF7AD7F0),
-  mouseOver: Color(0xFFDBF3FA),
-  mouseDown: Color(0xFF7AD7F0),
-  iconMouseOver: Color(0xFF7AD7F0),
-  iconMouseDown: Color(0xFFFFFFFF)
+  iconNormal: Color(0xFFBF40BF),
+  mouseDown: Color(0xFF702963),
+  mouseOver: Color(0xFFBF40BF),
+  iconMouseDown: Color(0xFFBF40BF),
+  iconMouseOver: Color(0xFFFFFFFF)
 );
 
 final closeButtonColors = WindowButtonColors(

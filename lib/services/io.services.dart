@@ -24,7 +24,7 @@ Future<dynamic> readFile(String location) async {
   }
 }
 
-writeFile(String location, String json) async {
+Future<dynamic> writeFile(String location, String json) async {
   final file = await _localFile(location);
   return file.writeAsString(json);
 }

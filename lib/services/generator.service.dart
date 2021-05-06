@@ -16,13 +16,13 @@ class Generator {
 
   final DateFormat _formatter = DateFormat('MMddyyyy_HHmmss');
 
-  final _util = Util();
+  final util = Util();
   final _buildOrderItems = BuildOrderItems();
 
   findPrice(args) async {
     final List<dynamic> spoPrice = args["spoPrice"];
     final priceCharacteristic = spoPrice.map((price) async {
-      String filename = _util.generateJSONFileLocation(PRODUCT_PRICE_FOLDER, price["id"]);
+      String filename = util.generateJSONFileLocation(PRODUCT_PRICE_FOLDER, price["id"]);
       
       dynamic jsonFile = await readFile(filename);
       
@@ -49,7 +49,7 @@ class Generator {
   }
 
   dynamic findMainSpoPrice(args) async {
-      String filename = _util.generateJSONFileLocation(PRODUCT_OFFERING_FOLDER, args["mainSpoId"]);
+      String filename = util.generateJSONFileLocation(PRODUCT_OFFERING_FOLDER, args["mainSpoId"]);
       dynamic jsonFile = await readFile(filename);
 
       return {
@@ -64,7 +64,7 @@ class Generator {
 
       final payload = _buildOrderItems.createBasicPayload();
       final mainOrder = _buildOrderItems.createMainOrder(bundledProduct["id"], null);
-      final onNetIndicator = _buildOrderItems.selectOnNetIndicator(_util.offNet3rdPartyProvider);
+      final onNetIndicator = _buildOrderItems.selectOnNetIndicator(util.offNet3rdPartyProvider);
 
       final offerGroupOrders = await _buildOrderItems.generateOfferGroupOrder(bundledProduct["bundledProdOfferGroupOption"]);
 
@@ -78,7 +78,7 @@ class Generator {
       final mainSpoId = getMainSpo(bundledProduct["bundledProductOffering"]);
       
       return {
-          "name": (_util.getLocaleValue(bundledProduct["localizedName"]) as String).replaceAll(RegExp(r'[^\w\s]'), ' '),
+          "name": (util.getLocaleValue(bundledProduct["localizedName"]) as String).replaceAll(RegExp(r'[^\w\s]'), ' '),
           "currency": getCurrency(bundledProduct["currency"]),
           "mainSpoId": mainSpoId,
           "payload": payload
@@ -86,15 +86,15 @@ class Generator {
   }
 
   
-  getGeneratedPayloadList() => _util.bpoIds.map((id) async {
+  getGeneratedPayloadList() => util.bpoIds.map((id) async {
       _logger.info("Generating Provide Payload: " + id);
 
-      final filename = _util.generateJSONFileLocation(PRODUCT_OFFERING_FOLDER, id);
+      final filename = util.generateJSONFileLocation(PRODUCT_OFFERING_FOLDER, id);
       return await readFile(filename)
           .then(buildPayload)
           .then(findMainSpoPrice)
           .then(findPrice)
-          .then(_util.writeToJSONFile)
+          .then(util.writeToJSONFile)
           .catchError((error) => error);
   });
 
@@ -110,11 +110,11 @@ class Generator {
 
         result.asMap().forEach((i, error) {
             if (error is NotABundleException) {
-                errorJSON[_util.bpoIds[i]] = error.cause;
+                errorJSON[util.bpoIds[i]] = error.cause;
             }
         });
 
-        writeFile('${_util.outputFolder}/error-${_formatter.format(DateTime.now())}.json', encoderWithInd(errorJSON));
+        writeFile('${util.outputFolder}/error-${_formatter.format(DateTime.now())}.json', encoderWithInd(errorJSON));
     }
   }
  

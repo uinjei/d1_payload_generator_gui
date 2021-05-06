@@ -21,14 +21,14 @@ import 'package:d1_payload_generator_gui/utils/constants.util.dart';
 
     Future<void> _loadSettings() async {
       final data = await loadSettings();
-        bpoIds = data["BPO_IDs"];
-        fdLocation = data["FD_LOCATION"];
-        outputFolder = data["OUTPUT_FOLDER"];
-        pretty = data["PRETTIFY"];
-        allowRandomQty = data["ALLOW_RANDOM_QTY"];
-        includeAllSpo = data["INCLUDE_ALL_SPO"];
-        offNet3rdPartyProvider = data["OFF_NET_3RD_PARTY_PROVIDER"];
-        productOffersWithPlace = data["PRODUCT_OFFERS_WITH_PLACE"];
+        bpoIds = data[BPO_IDs];
+        fdLocation = data[FD_LOCATION];
+        outputFolder = data[OUTPUT_FOLDER];
+        pretty = data[PRETTY];
+        allowRandomQty = data[ALLOW_RANDOM_QTY];
+        includeAllSpo = data[INCLUDE_ALL_SPO];
+        offNet3rdPartyProvider = data[OFF_NET_3RD_PARTY_PROVIDER];
+        productOffersWithPlace = data[PRODUCT_OFFERS_WITH_PLACE];
     }
 
     getLocaleValue(contents) => contents.firstWhere((content) => LOCALE == content["locale"])["value"];

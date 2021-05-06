@@ -1,3 +1,4 @@
+import 'package:d1_payload_generator_gui/style.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
@@ -13,9 +14,11 @@ class CustomTextBox extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       title: TextFormField(
+        style: whiteText,
         decoration: InputDecoration(
           border: UnderlineInputBorder(),
           labelText: label,
+          labelStyle: whiteText
         ),
         controller: controller,
       ),
