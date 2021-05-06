@@ -1,4 +1,4 @@
-class CustomException implements Exception {
-  String cause;
-  CustomException(this.cause);
+class NotABundleException implements Exception {
+  String cause = "Not a bundle";
+  NotABundleException();
 }

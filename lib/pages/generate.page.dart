@@ -1,7 +1,12 @@
 
+import 'dart:async';
+import 'dart:io';
+import 'dart:math';
+
 import 'package:d1_payload_generator_gui/components/multilinetextbox.components.dart';
 import 'package:d1_payload_generator_gui/components/switch.component.dart';
 import 'package:d1_payload_generator_gui/components/textbox.component.dart';
+import 'package:d1_payload_generator_gui/exceptions/custom.exception.dart';
 import 'package:d1_payload_generator_gui/services/json.service.dart';
 import 'package:d1_payload_generator_gui/services/generator.service.dart';
 import 'package:flutter/material.dart';
@@ -12,7 +17,7 @@ class GeneratePage extends StatefulWidget {
   _GeneratePageState createState() => _GeneratePageState();
 }
 
-class _GeneratePageState extends State<GeneratePage> {
+class _GeneratePageState extends State<GeneratePage> with TickerProviderStateMixin {
 
   final _logger = Logger("Generator");
 
@@ -23,20 +28,27 @@ class _GeneratePageState extends State<GeneratePage> {
   bool _offNet3rdPartyProvider = true;
   List _productOffersWithPlace = [];
 
+  double _progressValue = 0;
+  String _progressText = "";
+
   Generator? gen;
 
   final _bpoIdsController = TextEditingController();
   final _outputFolderController = TextEditingController();
   final _fdLocController = TextEditingController();
 
+  late AnimationController controller;
+
   @override
   void initState() {
+
     super.initState();
     gen = Generator();
-    WidgetsBinding.instance!.addPostFrameCallback((_) => _getSettings());
+    WidgetsBinding.instance!.addPostFrameCallback((_) => _initSettings());
     _bpoIdsController.addListener(_printLatestValue);
     _outputFolderController.addListener(_printLatestValue);
     _fdLocController.addListener(_printLatestValue);
+   
   }
 
   @override
@@ -63,7 +75,7 @@ class _GeneratePageState extends State<GeneratePage> {
   }
 
   // Fetch content from the json file
-  Future<void> _getSettings() async {
+  Future<void> _initSettings() async {
     final data = await loadSettings();
     setState(() {
       _bpoIds = data["BPO_IDs"];
@@ -79,7 +91,27 @@ class _GeneratePageState extends State<GeneratePage> {
   }
   
   _generate() {
-    gen!.generate();
+    progressWait(gen!.getGeneratedPayloadList().toList(), (completed, total) { })
+      .then(gen!.handleError)
+      .whenComplete(() => setState(() {
+        _progressText = "Generate Complete.";
+      }));
+  }
+  
+  Future<List<T>> progressWait<T>(List<Future<T>> futures, void progress(int completed, int total)) {
+    int total = futures.length;
+    int completed = 0;
+
+    FutureOr<T> complete(e) {
+      completed++;
+      progress(completed, total);
+      setState(() {
+        _progressValue = (completed / total).toDouble();
+        _progressText = e.toString();
+      });
+      return e;
+    }
+    return Future.wait([for (var future in futures) future.then(complete)]);
   }
 
   void prettyOnChanged(bool newValue) {setState(() { _pretty = newValue; });}
@@ -111,24 +143,32 @@ class _GeneratePageState extends State<GeneratePage> {
               ],
             )
           ),
+          SizedBox(height: 16,),
+          LinearProgressIndicator(
+            value: _progressValue,
+            semanticsLabel: 'Linear progress indicator',
+          ),
+          SizedBox(height: 16,),
           Row(
             children: [
               ElevatedButton(
                 child: Text('Reload File'),
-                onPressed: _getSettings,
+                onPressed: _initSettings,
               ),
               SizedBox(width: 16,),
               ElevatedButton(
                 child: Text('Save'),
-                onPressed: _getSettings,
+                onPressed: _initSettings,
               ),
               SizedBox(width: 16,),
               ElevatedButton(
                 child: Text('Generate'),
                 onPressed: _generate,
-              )
+              ),
+              SizedBox(width: 16),
+              Text(_progressText, overflow: TextOverflow.ellipsis,softWrap: false,),
             ],
-          )
+          ),
         ],
       ),
       );

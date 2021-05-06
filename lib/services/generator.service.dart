@@ -60,7 +60,7 @@ class Generator {
 
   buildPayload(bundledProduct) async {
 
-      if (!bundledProduct["isBundle"]) throw CustomException("Not a bundle");
+      if (!bundledProduct["isBundle"]) throw NotABundleException();
 
       final payload = _buildOrderItems.createBasicPayload();
       final mainOrder = _buildOrderItems.createMainOrder(bundledProduct["id"], null);
@@ -98,28 +98,24 @@ class Generator {
           .catchError((error) => error);
   });
 
+  handleError(result) {
+    final errorJSON = {};
 
-  Future generate() async {
-    
-    await Future.wait(getGeneratedPayloadList()).then((result) {
-      final errorJSON = {};
+    var errorCount = result.where((error) => error is NotABundleException).length;
 
-      var errorCount = result.where((error) => error is CustomException).length;
+    _logger.info("Successfully generated ${result.length - errorCount} payloads.");
 
-      _logger.info("Successfully generated ${result.length - errorCount} payloads.");
+    if (errorCount > 0) {
+        _logger.info("Error found in $errorCount file(s)");
 
-      if (errorCount > 0) {
-          _logger.info("Error found in $errorCount file(s)");
+        result.asMap().forEach((i, error) {
+            if (error is NotABundleException) {
+                errorJSON[_util.bpoIds[i]] = error.cause;
+            }
+        });
 
-          result.asMap().forEach((i, error) {
-              if (error is CustomException) {
-                  errorJSON[_util.bpoIds[i]] = error.cause;
-              }
-          });
-
-          writeFile('${_util.outputFolder}/error-${_formatter.format(DateTime.now())}.json', encoderWithInd(errorJSON));
-      }
-    });
+        writeFile('${_util.outputFolder}/error-${_formatter.format(DateTime.now())}.json', encoderWithInd(errorJSON));
+    }
   }
  
 }
