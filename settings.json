@@ -1,6 +1,13 @@
 {
     "FD_LOCATION": "./FD",
     "BPO_IDs": [
+        "729e5714-a421-46bc-b6bb-40dcc1fc19ae",
+        "d2dc23dc-11b4-4f62-b35c-115f60b3d9d7",
+        "79b93c4c-20f1-46cc-b7ec-2b6d1a41a67b",
+        "5bdd98be-a7f4-4eaf-8dbc-b4c432d2110c",
+        "a17355e9-056c-44b7-bb44-df87bf850b46",
+        "fe63dede-e0d0-4dcb-ab04-e7c4f6671894",
+        "36abe52f-13cd-4d69-b0d9-93e013b3f924",
         "76e2f2f2-0884-473e-ac5f-46a2a652e4e7",
         "70dae775-f211-4f8d-858b-f94eb21d14de"
     ],

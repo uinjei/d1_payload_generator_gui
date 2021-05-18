@@ -17,7 +17,7 @@ class CustomSwitch extends StatelessWidget {
       title: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: whiteText,),
+          Text(label, style: textBlack,),
           Switch(
             activeColor: Colors.purple,
             value: value,

@@ -1,7 +1,7 @@
 import 'package:bitsdojo_window/bitsdojo_window.dart';
+import 'package:d1_payload_generator_gui/components/leftside.component.dart';
 import 'package:d1_payload_generator_gui/components/windowbutton.component.dart';
-import 'package:d1_payload_generator_gui/pages/generate.page.dart';
-import 'package:d1_payload_generator_gui/style.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
@@ -9,6 +9,10 @@ const backgroundStartColor = Color(0xFFFFFFFF);
 const backgroundEndColor = Color(0xFF702963);
 
 class RightSide extends StatelessWidget {
+  final ValueListenable<String> page;
+
+  RightSide(this.page);
+
   @override
   Widget build(BuildContext context) {
     return Expanded(
@@ -25,20 +29,21 @@ class RightSide extends StatelessWidget {
         WindowTitleBarBox(
           child: Row(
             children: [
-              Expanded(child: MoveWindow()),
+              Expanded(child: MoveWindow(
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Padding(padding: EdgeInsets.fromLTRB(16, 0, 0, 0),
+                      child: Text(pages.firstWhere((element) => element["name"]==page.value)["title"]),
+                    )
+                  )
+                ),
+              ),
               WindowButtons()
             ],
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-          child: Align(
-          alignment: Alignment.centerLeft,
-          child: Text("Generate Payload", style: titleText,),
-        ),
-        ),
         Expanded (
-            child: GeneratePage(),
+            child: (pages.firstWhere((element) => element["name"]==page.value)["page"] as Widget)
         ),
         ],
       ),

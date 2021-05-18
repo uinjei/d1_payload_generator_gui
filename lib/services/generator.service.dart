@@ -85,6 +85,9 @@ class Generator {
       };
   }
 
+  Future<void> reloadSettings() async {
+    await util.reloadSettings();
+  }
   
   getGeneratedPayloadList() => util.bpoIds.map((id) async {
       _logger.info("Generating Provide Payload: " + id);

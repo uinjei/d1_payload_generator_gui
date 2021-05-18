@@ -6,19 +6,18 @@ class CustomTextBox extends StatelessWidget {
 
   
   final String label;
-  final TextEditingController controller;
+  final TextEditingController? controller;
 
   CustomTextBox({Key? key, required this.label, required this.controller}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      title: TextFormField(
-        style: whiteText,
+      title: TextField(
+        style: textBlack,
         decoration: InputDecoration(
-          border: UnderlineInputBorder(),
           labelText: label,
-          labelStyle: whiteText
+          labelStyle: textBlack
         ),
         controller: controller,
       ),

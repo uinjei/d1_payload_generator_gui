@@ -1,9 +1,12 @@
 import 'dart:io';
 
+import 'package:d1_payload_generator_gui/components/screen.component.dart';
+import 'package:d1_payload_generator_gui/globals.dart';
+import 'package:d1_payload_generator_gui/pages/editor.page.dart';
+import 'package:d1_payload_generator_gui/pages/generate.page.dart';
+import 'package:d1_payload_generator_gui/style.dart';
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
-import './components/leftside.component.dart';
-import './components/rightside.component.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 
 File outputFile = File('app.log');
@@ -36,23 +39,18 @@ void main() {
 const borderColor = Color(0xFFBF40BF);
 
 class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
-  @override
-  Widget build(BuildContext context) {
-    return new MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        body: WindowBorder(
-          width: 1,
-          color: borderColor,
-          child: Row(
-            children: [
-              LeftSide(),
-              RightSide()
-            ],
-          ),
-        ),
-      ),
-    );
+
+ @override
+    Widget build(BuildContext context) {
+      return new MaterialApp(
+        debugShowCheckedModeBanner: false,
+        theme: appTheme,
+        navigatorKey: AppGlobals.rootNavKey,
+        home: Screen(),
+        routes: {
+          "generate": (BuildContext context) => GeneratePage(),
+          "editor": (BuildContext context) => EditorPage(),
+        },
+      );
   }
 }

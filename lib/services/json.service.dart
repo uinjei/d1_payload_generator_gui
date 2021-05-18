@@ -9,6 +9,10 @@ Future<dynamic> saveSettings(data) async {
   return await writeFile("./settings.json", data);
 }
 
+Future<dynamic> savePayload(path, data) async {
+  return await writeFile(path, data);
+}
+
 dynamic toJson(String jsonString) => json.decode(jsonString);
 
 String encoderWithInd(jsonObject) {

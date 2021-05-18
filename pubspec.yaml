@@ -31,7 +31,9 @@ dependencies:
   bitsdojo_window: ^0.1.0+1
   logging: ^1.0.1
   intl: ^0.17.0
-
+  filepicker_windows: ^2.0.0
+  recase: ^4.0.0
+  
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -64,10 +66,10 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
-  # fonts:
-  #   - family: Schyler
-  #     fonts:
-  #       - asset: fonts/Schyler-Regular.ttf
+  fonts:
+    - family: Varela Round
+      fonts:
+        - asset: fonts/VarelaRound-Regular.ttf
   #       - asset: fonts/Schyler-Italic.ttf
   #         style: italic
   #   - family: Trajan Pro

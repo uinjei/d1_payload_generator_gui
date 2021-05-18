@@ -13,14 +13,13 @@ class MultilineTextBox extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       title: TextFormField(
-        style: whiteText,
+        style: textBlack,
         maxLines: 8,
         maxLength: 1000,
         keyboardType: TextInputType.multiline,
         decoration: InputDecoration(
-          border: UnderlineInputBorder(),
           labelText: label,
-          labelStyle: whiteText
+          labelStyle: textBlack
         ),
         controller: controller,
       ),

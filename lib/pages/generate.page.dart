@@ -1,18 +1,21 @@
 
 import 'dart:async';
+import 'dart:io';
 
 import 'package:d1_payload_generator_gui/components/multilinetextbox.components.dart';
 import 'package:d1_payload_generator_gui/components/switch.component.dart';
 import 'package:d1_payload_generator_gui/components/textbox.component.dart';
+import 'package:d1_payload_generator_gui/components/textboxwithbutton.component.dart';
 import 'package:d1_payload_generator_gui/services/json.service.dart';
 import 'package:d1_payload_generator_gui/services/generator.service.dart';
 import 'package:d1_payload_generator_gui/style.dart';
 import 'package:d1_payload_generator_gui/utils/constants.util.dart';
+import 'package:filepicker_windows/filepicker_windows.dart';
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 
 class GeneratePage extends StatefulWidget {
-    @override
+  @override
   _GeneratePageState createState() => _GeneratePageState();
 }
 
@@ -43,7 +46,6 @@ class _GeneratePageState extends State<GeneratePage> with TickerProviderStateMix
 
   @override
   void initState() {
-
     super.initState();
     gen = Generator();
     WidgetsBinding.instance!.addPostFrameCallback((_) => _initSettings());
@@ -66,6 +68,7 @@ class _GeneratePageState extends State<GeneratePage> with TickerProviderStateMix
     saveSettings(encoderWithInd(data)).whenComplete(() => setState(() {
       _progressText = "Settings updated.";
     }));
+    //_logger.info(encoderWithInd(data));
   }
 
   void _bpoIdsOnChanged() {
@@ -92,10 +95,10 @@ class _GeneratePageState extends State<GeneratePage> with TickerProviderStateMix
     saveOnChanged();
   }
 
-  String _listToString(List bpoIds) {
+  String _listToString(List items) {
     final concatenate = StringBuffer();
 
-    bpoIds.asMap().forEach((i, item){
+    items.asMap().forEach((i, item){
       concatenate.write('${i==0?"":","}"'+item+'"');
     });
     return concatenate.toString();
@@ -142,7 +145,8 @@ class _GeneratePageState extends State<GeneratePage> with TickerProviderStateMix
     });
   }
   
-  void _generate() {
+  void _generate() async {
+    await gen?.reloadSettings();
     _progressWait(gen!.getGeneratedPayloadList().toList(), (completed, total) { })
       .then(gen!.handleError)
       .whenComplete(() => setState(() {
@@ -150,6 +154,16 @@ class _GeneratePageState extends State<GeneratePage> with TickerProviderStateMix
       }));
   }
   
+  void _browseFD() {
+    _fdLocController.text = DirectoryPicker().getDirectory()!.path;
+    _fdOnChanged();
+  }
+
+  void _browseOutputFolder() {
+    _outputFolderController.text = DirectoryPicker().getDirectory()!.path;
+    _fdOnChanged();
+  }
+
   Future<List<T>> _progressWait<T>(List<Future<T>> futures, void progress(int completed, int total)) {
     int total = futures.length;
     int completed = 0;
@@ -168,34 +182,37 @@ class _GeneratePageState extends State<GeneratePage> with TickerProviderStateMix
 
   Widget build(BuildContext context) {
     return Scrollbar( controller: _scrollController,
-      isAlwaysShown: true,
+      //isAlwaysShown: true,
       child:Padding(
       padding: const EdgeInsets.all(25),
-      child: //Scrollbar(
-        //isAlwaysShown: true,
-        //controller: _scrollController,
-        /* child: */ ListView(
-          controller: _scrollController,
+      child: ListView(
+        controller: _scrollController,
           children: [
             Card(
               color: cardBgGray,
               margin: EdgeInsets.all(10),
-              child: MultilineTextBox(label: "BPO IDs", controller: _bpoIdsController),
+              child: Padding(padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
+                child: MultilineTextBox(label: "BPO IDs", controller: _bpoIdsController),
+              ),
             ),
             Card(
               color: cardBgGray,
               margin: EdgeInsets.all(10),
-              child: Column(
-                children: [
-                  CustomTextBox(label: "FD Location", controller: _fdLocController),
-                  CustomTextBox(label: "Output Folder", controller: _outputFolderController),
-                  CustomSwitch(label: "Pretty", value: _pretty, onChanged: prettyOnChanged),
-                  CustomSwitch(label: "Allow Random Qty", value: _allowRandomQty, onChanged: alloRandomQtyOnChanged),
-                  CustomSwitch(label: "Include All SPO", value: _includeAllSpo, onChanged: includeAllSpoOnChanged),
-                  CustomSwitch(label: "Off Net 3rd Party Provider", value: _offNet3rdPartyProvider, onChanged: offNet3rdPartyProviderOnChanged),
-                  CustomTextBox(label: "Product Offers With Place", controller: _productOffersWithPlaceController),
-                ],
-              )
+              child: Padding(padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
+                child: Column(
+                  children: [
+                    TextBoxWithButton(label: "FD Location", controller: _fdLocController,
+                      icon: Icon(Icons.folder_open), onPressed: _browseFD),
+                    TextBoxWithButton(label: "Output Folder", controller: _outputFolderController,
+                      icon: Icon(Icons.folder_open), onPressed: _browseOutputFolder),
+                    CustomSwitch(label: "Pretty", value: _pretty, onChanged: prettyOnChanged),
+                    CustomSwitch(label: "Allow Random Qty", value: _allowRandomQty, onChanged: alloRandomQtyOnChanged),
+                    CustomSwitch(label: "Include All SPO", value: _includeAllSpo, onChanged: includeAllSpoOnChanged),
+                    CustomSwitch(label: "Off Net 3rd Party Provider", value: _offNet3rdPartyProvider, onChanged: offNet3rdPartyProviderOnChanged),
+                    CustomTextBox(label: "Product Offers With Place", controller: _productOffersWithPlaceController),
+                  ],
+                ),
+              ),
             ),
             SizedBox(height: 16,),
             LinearProgressIndicator(
@@ -209,13 +226,12 @@ class _GeneratePageState extends State<GeneratePage> with TickerProviderStateMix
               children: [
                 SizedBox(width: 16,),
                 ElevatedButton(
-                  style: ButtonStyle(backgroundColor: MaterialStateProperty.all<Color>(Colors.purple)),
-                  child: Text('Generate', style: whiteText,),
+                  child: Text('Generate', style: textWhite,),
                   onPressed: _generate,
                 ),
                 SizedBox(width: 16),
                 Text(_progressText,
-                  style: TextStyle(color: Colors.white),
+                  style: textWhite,
                   overflow: TextOverflow.ellipsis, softWrap: false,
                 ),
               ],
