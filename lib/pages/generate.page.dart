@@ -65,7 +65,7 @@ class _GeneratePageState extends State<GeneratePage> with TickerProviderStateMix
   }
   
   void saveOnChanged() {
-    saveSettings(encoderWithInd(data)).whenComplete(() => setState(() {
+    saveSettings(indentJson(data)).whenComplete(() => setState(() {
       _progressText = "Settings updated.";
     }));
     //_logger.info(encoderWithInd(data));
@@ -192,8 +192,8 @@ class _GeneratePageState extends State<GeneratePage> with TickerProviderStateMix
               color: cardBgGray,
               margin: EdgeInsets.all(10),
               child: Padding(padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
-                child: MultilineTextBox(label: "BPO IDs", controller: _bpoIdsController),
-              ),
+                child: ListTile(title: MultilineTextBox(label: "BPO IDs", controller: _bpoIdsController),
+              ),),
             ),
             Card(
               color: cardBgGray,
@@ -201,15 +201,15 @@ class _GeneratePageState extends State<GeneratePage> with TickerProviderStateMix
               child: Padding(padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
                 child: Column(
                   children: [
-                    TextBoxWithButton(label: "FD Location", controller: _fdLocController,
-                      icon: Icon(Icons.folder_open), onPressed: _browseFD),
-                    TextBoxWithButton(label: "Output Folder", controller: _outputFolderController,
-                      icon: Icon(Icons.folder_open), onPressed: _browseOutputFolder),
+                    ListTile(title: TextBoxWithButton(label: "FD Location", controller: _fdLocController,
+                      icon: Icon(Icons.folder_open), onPressed: _browseFD),),
+                    ListTile(title: TextBoxWithButton(label: "Output Folder", controller: _outputFolderController,
+                      icon: Icon(Icons.folder_open), onPressed: _browseOutputFolder),),
                     CustomSwitch(label: "Pretty", value: _pretty, onChanged: prettyOnChanged),
                     CustomSwitch(label: "Allow Random Qty", value: _allowRandomQty, onChanged: alloRandomQtyOnChanged),
                     CustomSwitch(label: "Include All SPO", value: _includeAllSpo, onChanged: includeAllSpoOnChanged),
                     CustomSwitch(label: "Off Net 3rd Party Provider", value: _offNet3rdPartyProvider, onChanged: offNet3rdPartyProviderOnChanged),
-                    CustomTextBox(label: "Product Offers With Place", controller: _productOffersWithPlaceController),
+                    ListTile(title: CustomTextBox(label: "Product Offers With Place", controller: _productOffersWithPlaceController),),
                   ],
                 ),
               ),

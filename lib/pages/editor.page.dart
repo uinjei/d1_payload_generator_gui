@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:collection/collection.dart';
+import 'package:d1_payload_generator_gui/components/customdivider.component.dart';
+import 'package:d1_payload_generator_gui/components/textboxsmall.component.dart';
 import 'package:recase/recase.dart';
 
-import 'package:d1_payload_generator_gui/components/textbox.component.dart';
 import 'package:d1_payload_generator_gui/services/io.services.dart';
 import 'package:d1_payload_generator_gui/services/json.service.dart';
 import 'package:d1_payload_generator_gui/style.dart';
@@ -26,26 +28,41 @@ class _EditorPageState extends State<EditorPage> {
   List<dynamic> orderItems = [];
   Map data = {};
   Map settingsData = {};
+  String fdLoc = "";
   bool loading = false;
+  List spoNames = [];
 
-  List<List<TextEditingController>> reservationControllers = List.empty(growable: true);
+  List<List<TextEditingController>> characteristicControllers = List.empty(growable: true);
 
   String selectedPayloadPath = "";
   int selectedIndex = -1;
 
   List<Item> expandedData = [];
 
+  @override
   void initState() {
     super.initState();
     WidgetsBinding.instance!.addPostFrameCallback((_) => _init());
     
   }
 
-  void _saveOnChanged() {
+  @override
+  void dispose() {
+    characteristicControllers.forEach((orderItems) {orderItems.forEach((characteristic) { characteristic.dispose();});});
+    super.dispose();
+  }
+
+  Future<void> _saveOnChanged() async {
     data["orderItem"][0]["orderItem"] = orderItems;
-    savePayload(selectedPayloadPath ,encoderWithInd(data)).whenComplete(() => setState(() {
+    await savePayload(selectedPayloadPath ,indentJson(data)).whenComplete(() => setState(() {
       //_progressText = "Settings updated.";
     }));
+  }
+
+  _getOfferDetails(spoId) async {
+    final spo = await readFile("$fdLoc/$PRODUCT_OFFERING_FOLDER/$spoId.json");
+    //_logger.info(spo["id"]);
+    return await spo["localizedName"].firstWhere((elem) => elem["locale"]==LOCALE)["value"];
   }
 
   void _init() async {
@@ -53,6 +70,7 @@ class _EditorPageState extends State<EditorPage> {
 
     settingsData = await loadSettings();
     final _payloads = await _dirContents(Directory(settingsData[OUTPUT_FOLDER]));
+    fdLoc = settingsData[FD_LOCATION];
 
     setState(() {
       payloads = _payloads;
@@ -60,8 +78,8 @@ class _EditorPageState extends State<EditorPage> {
   }
 
   void _updateControllersState() {
-    for (var i = 0; i < reservationControllers.length; i++) { 
-      List c = reservationControllers[i];
+    for (var i = 0; i < characteristicControllers.length; i++) { 
+      List c = characteristicControllers[i];
       for (var j = 0; j < c.length; j++) {
         final charValue = orderItems[i]["product"]["characteristic"][j]["value"];
         c[j].text = charValue is String?charValue:charValue.toString();
@@ -89,9 +107,23 @@ class _EditorPageState extends State<EditorPage> {
 
     data = await readFile(path);
     orderItems = data["orderItem"][0]["orderItem"];
-    reservationControllers = List.empty(growable: true);
+    orderItems.sort((a,b) => a["productOffering"]["id"].compareTo(b["productOffering"]["id"]));
+    final grouped = orderItems.groupListsBy((element) => element["productOffering"]["id"]);
+
+    characteristicControllers = List.empty(growable: true);
     selectedPayloadPath = path;
     
+    spoNames = (await Future.wait(grouped.values.map((value) {
+      final isSingle = value.length==1;
+      return Future.wait(value.asMap().entries.map((e) async {
+        final k = e.key;
+        final v = e.value;
+        if (v["productOfferingGroupOption"]!=null)
+          return "${ReCase(v["product"]["characteristic"].firstWhere((e) => e["name"]=="equipmentGroup")["value"]).titleCase} ${isSingle?"":k+1}";
+        return "${await _getOfferDetails(value[k]["productOffering"]["id"])} ${isSingle?"":k+1}";
+      }));
+    }))).expand((element) => element).toList();
+
     _generateItems(orderItems).then((value) {
       setState(() {
         expandedData = value;
@@ -106,6 +138,7 @@ class _EditorPageState extends State<EditorPage> {
   }
 
   Future<List<Item>> _generateItems(data) async {
+    
     return List.generate(data.length, (int index) {
       final orderItem = orderItems[index];
 
@@ -113,41 +146,41 @@ class _EditorPageState extends State<EditorPage> {
 
       for (var i = 0; i < orderItem["product"]["characteristic"].length; i++) {
         
-        TextEditingController _characteristicController;
-        _characteristicController = TextEditingController();
-        _characteristicController.addListener(() {
-          orderItem["product"]["characteristic"][i]["value"] = _characteristicController.text;
+        TextEditingController characteristicController;
+        characteristicController = TextEditingController();
+        characteristicController.addListener(() {
+          orderItem["product"]["characteristic"][i]["value"] = characteristicController.text;
           _saveOnChanged();
         });
-        c.add(_characteristicController);
+        c.add(characteristicController);
       }
 
-      reservationControllers.add(c);
+      characteristicControllers.add(c);
 
       _updateControllersState();
 
       return Item(
-        headerValue: "Order Item $index",
+        headerValue: "${spoNames[index]}",
         expandedValue: Container(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text("Extensions"),
-              Text("ReservationId: ${orderItem["extensions"]["reservationId"]}"),
-              Divider(),
+              Text("Extensions", style: TextStyle(fontWeight: FontWeight.bold),),
+              Text("ReservationId: ${orderItem["extensions"]["reservationId"]}",),
+              CustomDivider(),
               Text("Quantity: ${orderItem["quantity"]}"),
-              Divider(),
-              Text("Product Offering"),
+              CustomDivider(),
+              Text("Product Offering", style: TextStyle(fontWeight: FontWeight.bold),),
               Text("Id: ${orderItem["productOffering"]["id"]}"),
-              Divider(),
+              CustomDivider(),
               Text("Action: ${orderItem["action"]}"),
-              Divider(),
+              CustomDivider(),
               ...generateListedProperties(orderItem["modifyReason"],"Modify Reason"),
-              Divider(),
+              CustomDivider(),
               ...generateListedProperties(orderItem["externalIdentifier"],"External Identifier"),
-              Divider(),
-              Text("Product"),
-              Text("Product Specification"),
+              CustomDivider(),
+              Text("Product", style: TextStyle(fontWeight: FontWeight.bold),),
+              Text("Product Specification", style: TextStyle(fontWeight: FontWeight.bold),),
               Text("Id: ${orderItem["product"]["productSpecification"]["id"]}"),
               ...generateListedTextBoxProperties(orderItem["product"]["characteristic"],"Characteristic", c),
               ...generateListedProperties(orderItem["product"]["place"], "Place"),
@@ -187,14 +220,13 @@ class _EditorPageState extends State<EditorPage> {
                     child: ListTile(
                       //dense: true,
                       //contentPadding: EdgeInsets.symmetric(vertical: 0.0, horizontal: 16.0),
-                      title: Text(parts[0], /* style: TextStyle(fontSize: 14), */),
+                      title: Text(parts[0],),
                       subtitle: Row(
                         children: [
                           Text('${parts[1]} | $timing | $proration', style: TextStyle(fontSize: 12),),
                         ],
                       ),
                       trailing: Icon(Icons.chevron_right),
-                      /* tileColor: Colors.white, */
                       onTap: () => _getSelectedPayload(payloads[index].path, index),
                     )
                   ),
@@ -219,7 +251,7 @@ class _EditorPageState extends State<EditorPage> {
                   )
                   :loading?Container(
                     alignment: Alignment.center,
-                    child: Text("Fetching..."),
+                    child: Text("Please wait..."),
                     height: 500,
                   ): ExpansionPanelList(
                     expansionCallback: (int index, bool isExpanded) {
@@ -227,28 +259,32 @@ class _EditorPageState extends State<EditorPage> {
                         expandedData[index].isExpanded = !isExpanded;
                       });
                     },
-                    children: expandedData.map<ExpansionPanel>((Item item) {
+                    children: expandedData.asMap().entries.map<ExpansionPanel>((MapEntry item) {
+                      final value = item.value;
+                      final index = item.key;
                       return ExpansionPanel(
                         headerBuilder: (BuildContext context, bool isExpanded) {
                           return ListTile(
                             //dense: true,
                             //contentPadding: EdgeInsets.symmetric(vertical: 0.0, horizontal: 16.0),
-                            title: Text(item.headerValue),
+                            title: Text(value.headerValue),
                           );
                         },
                         body: ListTile(
                           dense: true,
                           //contentPadding: EdgeInsets.symmetric(vertical: 0.0, horizontal: 16.0),
-                          title: item.expandedValue,
+                          title: value.expandedValue,
                           /* subtitle: item.expandedSubValue, */
-                          trailing: Icon(Icons.copy),
-                          onTap: () {
-                            /* setState(() {
-                              expandedData.removeWhere((currentItem) => item == currentItem);
-                            }); */
-                          }
+                          trailing: IconButton(
+                            icon: Icon(Icons.copy),
+                            onPressed: () async {
+                            orderItems.add(orderItems[index]);
+                            await _saveOnChanged();
+                            _getSelectedPayload(payloads[selectedIndex].path, selectedIndex);
+                          },
+                          ),
                         ),
-                        isExpanded: item.isExpanded,
+                        isExpanded: value.isExpanded,
                       );
                     }).toList(),
                   ),
@@ -276,13 +312,14 @@ class Item {
 
 List<Widget> generateListedProperties(List<dynamic>? list, String parent) {
   if (list==null || list.isEmpty)
-    return [Text("Empty")];
+    return [];
 
   final nameSet = list[0].keys.toList();
+  final isSingle = list.length==1;
   return List.generate(list.length, (index) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Text("$parent $index"),
+      Text("$parent ${isSingle?"":index+1}", style: TextStyle(fontWeight: FontWeight.bold),),
       ...List.generate(nameSet.length, (ind) => Text("${ReCase(nameSet[ind]).titleCase}: ${list[index][nameSet[ind]]}"))
     ],
   ));
@@ -290,14 +327,19 @@ List<Widget> generateListedProperties(List<dynamic>? list, String parent) {
 
 List<Widget> generateListedTextBoxProperties(List<dynamic> list, String parent, List<TextEditingController> controllers) {
   if (list.isEmpty)
-    return [Text("Empty")];
+    return [];
+
+  final isSingle = list.length==1;
 
   return List.generate(list.length, (index) {
+    final title = "${ReCase(list[index]["name"]).titleCase}";
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("$parent $index"),
-        CustomTextBox(label: "${ReCase(list[index]["name"]).titleCase}", controller: controllers[index]),
+        Text("$parent ${isSingle?"":index+1}", style: TextStyle(fontWeight: FontWeight.bold),),
+        TextBoxSmall(label: title,
+          controller: controllers[index], enabled: title!="Equipment Group",),
       ],
     );
   });

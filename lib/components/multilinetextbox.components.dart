@@ -11,18 +11,18 @@ class MultilineTextBox extends StatelessWidget {
   MultilineTextBox({Key? key, required this.label, required this.controller}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      title: TextFormField(
+    return TextFormField(
         style: textBlack,
         maxLines: 8,
         maxLength: 1000,
         keyboardType: TextInputType.multiline,
         decoration: InputDecoration(
           labelText: label,
-          labelStyle: textBlack
+          labelStyle: textBlack,
+          contentPadding: EdgeInsets.all(10),
+          isDense: true,
         ),
         controller: controller,
-      ),
     );
   }
   

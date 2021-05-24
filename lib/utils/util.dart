@@ -40,6 +40,6 @@ import 'package:d1_payload_generator_gui/utils/constants.util.dart';
     generateJSONFileLocation(String type, String id) => '$fdLocation/$type/$id.json';
 
     writeToJSONFile(args) => writeFile('$outputFolder/${args["name"]}_${args["currency"]}_${args["timing"]}_${args["proration"]}.json', 
-        pretty?encoderWithInd(args["payload"]): json.encode(args["payload"]));
+        pretty?indentJson(args["payload"]): json.encode(args["payload"]));
 
 }

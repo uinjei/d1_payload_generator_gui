@@ -15,7 +15,7 @@ Future<dynamic> savePayload(path, data) async {
 
 dynamic toJson(String jsonString) => json.decode(jsonString);
 
-String encoderWithInd(jsonObject) {
+String indentJson(jsonObject) {
   final encoder = new JsonEncoder.withIndent("    ");
   return encoder.convert(jsonObject);
 }

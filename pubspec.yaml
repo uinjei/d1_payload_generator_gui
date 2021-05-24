@@ -33,6 +33,7 @@ dependencies:
   intl: ^0.17.0
   filepicker_windows: ^2.0.0
   recase: ^4.0.0
+  collection: ^1.15.0
   
 dev_dependencies:
   flutter_test:

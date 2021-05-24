@@ -117,7 +117,7 @@ class Generator {
             }
         });
 
-        writeFile('${util.outputFolder}/error-${_formatter.format(DateTime.now())}.json', encoderWithInd(errorJSON));
+        writeFile('${util.outputFolder}/error-${_formatter.format(DateTime.now())}.json', indentJson(errorJSON));
     }
   }
  

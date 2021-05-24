@@ -12,15 +12,15 @@ class CustomTextBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      title: TextField(
+    return TextField(
         style: textBlack,
         decoration: InputDecoration(
           labelText: label,
-          labelStyle: textBlack
+          labelStyle: textBlack,
+          contentPadding: EdgeInsets.all(10),
+          isDense: true,
         ),
         controller: controller,
-      ),
     );
   }
   

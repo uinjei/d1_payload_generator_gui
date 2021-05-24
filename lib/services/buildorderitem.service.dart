@@ -2,6 +2,9 @@ import 'dart:math';
 import 'package:d1_payload_generator_gui/services/io.services.dart';
 import 'package:d1_payload_generator_gui/utils/constants.util.dart';
 import 'package:d1_payload_generator_gui/utils/util.dart';
+import 'package:logging/logging.dart';
+
+final _logger = Logger("Generator");
 
 class BuildOrderItems {
 
@@ -93,7 +96,9 @@ class BuildOrderItems {
         final characteristicValue = content["characteristicValue"] as List<dynamic>;
         return {
             "name":content["name"],
-            "value": characteristicValue[generateRandomNumber(0, characteristicValue.length)]["value"]
+            "value": characteristicValue.length>0?
+            characteristicValue[generateRandomNumber(0, characteristicValue.length)]["value"]:
+            generateValue(content["valueType"])
         };
       }).toList();
 

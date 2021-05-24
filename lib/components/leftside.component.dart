@@ -49,14 +49,14 @@ final List<Map> pages = [
     "name": "Editor",
     "title": "Edit Payloads",
     "page": editor,
-    "icon": Icons.folder_open,
+    "icon": Icons.edit_attributes_outlined,
     "onPressed": (page) { page.value = "Editor";}
   },
   {
     "name": "Generate",
     "title": "Generate Payload",
     "page": generate,
-    "icon": Icons.flight_land,
+    "icon": Icons.drive_file_move_outlined,
     "onPressed": (page) { page.value = "Generate";}
   }
 ];
