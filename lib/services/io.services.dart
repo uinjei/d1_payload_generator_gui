@@ -3,12 +3,27 @@
 import 'dart:io';
 
 import 'package:d1_payload_generator_gui/services/json.service.dart';
+import 'package:d1_payload_generator_gui/utils/util.dart';
 import 'package:logging/logging.dart';
 
 final _logger = Logger('IO');
 
 Future<File> _localFile(String path) async {
   return File(path);
+}
+
+Future<dynamic> readFileMeta(String location) async {
+    final file = await _localFile(location);
+    String contents = await file.readAsString();
+    final c = contents.split("**/");
+    return toJson(c[0].replaceAll(RegExp(r'/\*\*SYSTEM GENERATED DO NOT INCLUDE THIS COMMENT IN YOUR PAYLOAD'), ""));
+}
+
+Future<dynamic> readFileContent(String location) async {
+    final file = await _localFile(location);
+    String contents = await file.readAsString();
+    final c = contents.split("**/");
+    return toJson(c[1]);
 }
 
 Future<dynamic> readFile(String location) async {

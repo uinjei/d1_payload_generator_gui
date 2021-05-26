@@ -4,6 +4,8 @@ import 'package:d1_payload_generator_gui/services/io.services.dart';
 import 'package:d1_payload_generator_gui/services/json.service.dart';
 import 'package:d1_payload_generator_gui/utils/constants.util.dart';
 
+const PREF_META = "SYSTEM GENERATED DO NOT INCLUDE THIS COMMENT IN YOUR PAYLOAD";
+
   class Util {
 
     List bpoIds = [];
@@ -38,8 +40,11 @@ import 'package:d1_payload_generator_gui/utils/constants.util.dart';
     getLocaleValue(contents) => contents.firstWhere((content) => LOCALE == content["locale"])["value"];
       
     generateJSONFileLocation(String type, String id) => '$fdLocation/$type/$id.json';
+  
+    generateMeta(args) => '/**$PREF_META{"id":"${args["id"]}","name":"${args["name"]}",'+
+      '"currency":"${args["currency"]}","proration":"${args["proration"]}","timing":"${args["timing"]}"}**/\n';
 
     writeToJSONFile(args) => writeFile('$outputFolder/${args["name"]}_${args["currency"]}_${args["timing"]}_${args["proration"]}.json', 
-        pretty?indentJson(args["payload"]): json.encode(args["payload"]));
+        generateMeta(args) + (pretty?indentJson(args["payload"]): json.encode(args["payload"])));
 
 }

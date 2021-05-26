@@ -1,9 +1,11 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:collection/collection.dart';
 import 'package:d1_payload_generator_gui/components/customdivider.component.dart';
 import 'package:d1_payload_generator_gui/components/textboxsmall.component.dart';
+import 'package:d1_payload_generator_gui/utils/util.dart';
 import 'package:recase/recase.dart';
 
 import 'package:d1_payload_generator_gui/services/io.services.dart';
@@ -22,7 +24,7 @@ class EditorPage extends StatefulWidget {
 
 class _EditorPageState extends State<EditorPage> {
 
-  List<FileSystemEntity> payloads = [];
+  List<Map> payloads = [];
   final _scrollController = ScrollController();
   final _payloadScrollController = ScrollController();
   List<dynamic> orderItems = [];
@@ -35,6 +37,7 @@ class _EditorPageState extends State<EditorPage> {
   List<List<TextEditingController>> characteristicControllers = List.empty(growable: true);
 
   String selectedPayloadPath = "";
+  Map metadata = {};
   int selectedIndex = -1;
 
   List<Item> expandedData = [];
@@ -54,7 +57,7 @@ class _EditorPageState extends State<EditorPage> {
 
   Future<void> _saveOnChanged() async {
     data["orderItem"][0]["orderItem"] = orderItems;
-    await savePayload(selectedPayloadPath ,indentJson(data)).whenComplete(() => setState(() {
+    await savePayload(selectedPayloadPath , '/**$PREF_META${json.encode(metadata)}**/\n${indentJson(data)}').whenComplete(() => setState(() {
       //_progressText = "Settings updated.";
     }));
   }
@@ -88,16 +91,21 @@ class _EditorPageState extends State<EditorPage> {
 
   }
 
-  Future<List<FileSystemEntity>> _dirContents(Directory dir) {
-    var files = <FileSystemEntity>[];
-    var completer = Completer<List<FileSystemEntity>>();
+  Future<List<Map>> _dirContents(Directory dir) {
+    var m = <Map>[];
+    var completer = Completer<List<Map>>();
     final lister = dir.list(recursive: false);
-    lister.listen ( 
-        (file) => files.add(file),
-        onDone: () => completer.complete(files)
-        );
+    lister.listen((file) async {
+      m.add({
+        "metadata": metadata = await _getMeta(file.path),
+        "file": file,
+      });
+    },
+        onDone: () => completer.complete(m));
     return completer.future;
   }
+
+  _getMeta(path) async => await readFileMeta(path);
 
   void _getSelectedPayload(path, index) async {
 
@@ -105,13 +113,15 @@ class _EditorPageState extends State<EditorPage> {
       loading = true;
     });
 
-    data = await readFile(path);
+    data = await readFileContent(path);
+    final meta = await readFileMeta(path);
     orderItems = data["orderItem"][0]["orderItem"];
     orderItems.sort((a,b) => a["productOffering"]["id"].compareTo(b["productOffering"]["id"]));
     final grouped = orderItems.groupListsBy((element) => element["productOffering"]["id"]);
 
     characteristicControllers = List.empty(growable: true);
     selectedPayloadPath = path;
+    metadata = meta;
     
     spoNames = (await Future.wait(grouped.values.map((value) {
       final isSingle = value.length==1;
@@ -193,7 +203,7 @@ class _EditorPageState extends State<EditorPage> {
 
   @override
   Widget build(BuildContext context) {
-    payloads.removeWhere((element) => element.path.contains("error-"));
+    payloads.removeWhere((element) => element["file"].path.contains("error-"));
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -210,24 +220,25 @@ class _EditorPageState extends State<EditorPage> {
               itemCount: payloads.length,
               controller: _scrollController,
               itemBuilder: (context, index) {
-                final path = payloads[index].path.split("\\").last;
-                final parts = path.split("_");
-                final timing = parts[2]=="D"?"Advance":"Arrear";
-                final proration = parts[3].split(".").first=="P"?"Prorated":"Non Prorated";
+                final path = payloads[index]["file"].path.split("\\").last;
+                final metadata = payloads[index]["metadata"];
+                //_logger.info("comtent>> " + metadata.toString());
                 return Material(
                   child: Ink(
                     color: selectedIndex==index?Colors.black.withOpacity(0.12):Colors.white,
                     child: ListTile(
                       //dense: true,
                       //contentPadding: EdgeInsets.symmetric(vertical: 0.0, horizontal: 16.0),
-                      title: Text(parts[0],),
-                      subtitle: Row(
+                      title: Text(metadata["name"],),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('${parts[1]} | $timing | $proration', style: TextStyle(fontSize: 12),),
+                          Text(path, style: TextStyle(fontSize: 10)),
+                          Text('${metadata["currency"]} | ${metadata["timing"]} | ${metadata["proration"]}', style: TextStyle(fontSize: 12),),
                         ],
                       ),
                       trailing: Icon(Icons.chevron_right),
-                      onTap: () => _getSelectedPayload(payloads[index].path, index),
+                      onTap: () => _getSelectedPayload(payloads[index]["file"].path, index),
                     )
                   ),
                 );
@@ -280,7 +291,7 @@ class _EditorPageState extends State<EditorPage> {
                             onPressed: () async {
                             orderItems.add(orderItems[index]);
                             await _saveOnChanged();
-                            _getSelectedPayload(payloads[selectedIndex].path, selectedIndex);
+                            _getSelectedPayload(payloads[selectedIndex]["file"].path, selectedIndex);
                           },
                           ),
                         ),

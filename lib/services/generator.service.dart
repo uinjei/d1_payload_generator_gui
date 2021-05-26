@@ -78,6 +78,7 @@ class Generator {
       final mainSpoId = getMainSpo(bundledProduct["bundledProductOffering"]);
       
       return {
+          "id" : bundledProduct["id"],
           "name": (util.getLocaleValue(bundledProduct["localizedName"]) as String).replaceAll(RegExp(r'[^\w\s]'), ' '),
           "currency": getCurrency(bundledProduct["currency"]),
           "mainSpoId": mainSpoId,
@@ -98,7 +99,7 @@ class Generator {
           .then(findMainSpoPrice)
           .then(findPrice)
           .then(util.writeToJSONFile)
-          .catchError((error) => error);
+          /* .catchError((error) => error) */;
   });
 
   handleError(result) {
