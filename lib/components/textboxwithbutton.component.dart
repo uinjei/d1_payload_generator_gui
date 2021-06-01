@@ -1,5 +1,5 @@
 import 'package:d1_payload_generator_gui/style.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/widgets.dart';
 
 class TextBoxWithButton extends StatelessWidget {
@@ -14,21 +14,21 @@ class TextBoxWithButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
+    return CupertinoFormRow(
+      child: CupertinoTextField.borderless(
         style: textBlack,
-        decoration: InputDecoration(
-          labelText: label,
-          labelStyle: textBlack,
-          contentPadding: EdgeInsets.all(10),
-          isDense: true,
-          suffixIcon: IconButton(
-            icon: icon,
+        prefix: Text("$label:"),
+        suffix: MouseRegion(
+          cursor: SystemMouseCursors.click,
+          child: CupertinoButton(
+            child: icon,
             onPressed: () {
               onPressed();
             },
           ),
         ),
         controller: controller,
+      ),
     );
   }
   

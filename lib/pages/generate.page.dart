@@ -1,6 +1,5 @@
 
 import 'dart:async';
-import 'dart:io';
 
 import 'package:d1_payload_generator_gui/components/multilinetextbox.components.dart';
 import 'package:d1_payload_generator_gui/components/switch.component.dart';
@@ -8,11 +7,12 @@ import 'package:d1_payload_generator_gui/components/textbox.component.dart';
 import 'package:d1_payload_generator_gui/components/textboxwithbutton.component.dart';
 import 'package:d1_payload_generator_gui/services/json.service.dart';
 import 'package:d1_payload_generator_gui/services/generator.service.dart';
-import 'package:d1_payload_generator_gui/style.dart';
 import 'package:d1_payload_generator_gui/utils/constants.util.dart';
 import 'package:filepicker_windows/filepicker_windows.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
+import 'package:oktoast/oktoast.dart';
 
 class GeneratePage extends StatefulWidget {
   @override
@@ -32,8 +32,7 @@ class _GeneratePageState extends State<GeneratePage> with TickerProviderStateMix
   bool _offNet3rdPartyProvider = true;
   List _productOffersWithPlace = [];
 
-  double _progressValue = 0;
-  String _progressText = "";
+  bool _loading = false;
 
   Generator? gen;
 
@@ -65,10 +64,10 @@ class _GeneratePageState extends State<GeneratePage> with TickerProviderStateMix
   }
   
   void saveOnChanged() {
+    _loading = true;
     saveSettings(indentJson(data)).whenComplete(() => setState(() {
-      _progressText = "Settings updated.";
+      _loading = false;
     }));
-    //_logger.info(encoderWithInd(data));
   }
 
   void _bpoIdsOnChanged() {
@@ -146,11 +145,15 @@ class _GeneratePageState extends State<GeneratePage> with TickerProviderStateMix
   }
   
   void _generate() async {
+    setState(() {
+      _loading = true;
+    });
     await gen?.reloadSettings();
     _progressWait(gen!.getGeneratedPayloadList().toList(), (completed, total) { })
       .then(gen!.handleError)
       .whenComplete(() => setState(() {
-        _progressText = "Generate Complete.";
+        _loading = false;
+        showToast("Payload generated");
       }));
   }
   
@@ -172,8 +175,7 @@ class _GeneratePageState extends State<GeneratePage> with TickerProviderStateMix
       completed++;
       progress(completed, total);
       setState(() {
-        _progressValue = (completed / total).toDouble();
-        _progressText = e.toString();
+        _loading = true;
       });
       return e;
     }
@@ -181,64 +183,42 @@ class _GeneratePageState extends State<GeneratePage> with TickerProviderStateMix
   }
 
   Widget build(BuildContext context) {
-    return Scrollbar( controller: _scrollController,
-      //isAlwaysShown: true,
-      child:Padding(
-      padding: const EdgeInsets.all(25),
-      child: ListView(
-        controller: _scrollController,
+    return Padding(
+      padding: const EdgeInsets.all(10),
+        child: Column(
           children: [
-            Card(
-              color: cardBgGray,
-              margin: EdgeInsets.all(10),
-              child: Padding(padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
-                child: ListTile(title: MultilineTextBox(label: "BPO IDs", controller: _bpoIdsController),
-              ),),
-            ),
-            Card(
-              color: cardBgGray,
-              margin: EdgeInsets.all(10),
-              child: Padding(padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
-                child: Column(
+            Form(
+                child: CupertinoFormSection.insetGrouped(
+                  backgroundColor: Colors.transparent,
                   children: [
-                    ListTile(title: TextBoxWithButton(label: "FD Location", controller: _fdLocController,
-                      icon: Icon(Icons.folder_open), onPressed: _browseFD),),
-                    ListTile(title: TextBoxWithButton(label: "Output Folder", controller: _outputFolderController,
-                      icon: Icon(Icons.folder_open), onPressed: _browseOutputFolder),),
+                    MultilineTextBox(label: "BPO IDs", controller: _bpoIdsController),
+                    TextBoxWithButton(label: "FD Location", controller: _fdLocController,
+                      icon: Icon(CupertinoIcons.folder_open), onPressed: _browseFD),
+                    TextBoxWithButton(label: "Output Folder", controller: _outputFolderController,
+                      icon: Icon(CupertinoIcons.folder_open), onPressed: _browseOutputFolder),
                     CustomSwitch(label: "Pretty", value: _pretty, onChanged: prettyOnChanged),
                     CustomSwitch(label: "Allow Random Qty", value: _allowRandomQty, onChanged: alloRandomQtyOnChanged),
                     CustomSwitch(label: "Include All SPO", value: _includeAllSpo, onChanged: includeAllSpoOnChanged),
                     CustomSwitch(label: "Off Net 3rd Party Provider", value: _offNet3rdPartyProvider, onChanged: offNet3rdPartyProviderOnChanged),
-                    ListTile(title: CustomTextBox(label: "Product Offers With Place", controller: _productOffersWithPlaceController),),
+                    CustomTextBox(label: "Product Offers With Place", controller: _productOffersWithPlaceController),
+                    Padding(
+                      padding: EdgeInsets.only(top: 5, bottom: 5),
+                      child: SizedBox(
+                        child: MouseRegion(
+                          cursor: SystemMouseCursors.click,
+                          child: CupertinoButton(
+                            color: CupertinoColors.activeBlue,
+                            child: _loading?CupertinoActivityIndicator(animating: true, radius: 10):Text("Generate"),
+                            onPressed: _generate,
+                          ),
+                        )
+                      ),
+                    ),
                   ],
                 ),
-              ),
-            ),
-            SizedBox(height: 16,),
-            LinearProgressIndicator(
-              value: _progressValue,
-              semanticsLabel: 'Linear progress indicator',
-              backgroundColor: Colors.purple,
-              valueColor: AlwaysStoppedAnimation<Color>(Colors.purpleAccent),
-            ),
-            SizedBox(height: 16,),
-            Row(
-              children: [
-                SizedBox(width: 16,),
-                ElevatedButton(
-                  child: Text('Generate', style: textWhite,),
-                  onPressed: _generate,
-                ),
-                SizedBox(width: 16),
-                Text(_progressText,
-                  style: textWhite,
-                  overflow: TextOverflow.ellipsis, softWrap: false,
-                ),
-              ],
             ),
           ],
         ),
-      )
     );
   }
 }

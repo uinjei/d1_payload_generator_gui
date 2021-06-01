@@ -1,5 +1,5 @@
 import 'package:d1_payload_generator_gui/style.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/widgets.dart';
 
 class MultilineTextBox extends StatelessWidget {
@@ -11,19 +11,14 @@ class MultilineTextBox extends StatelessWidget {
   MultilineTextBox({Key? key, required this.label, required this.controller}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    return TextFormField(
+    return CupertinoFormRow(child: CupertinoTextField.borderless(
         style: textBlack,
         maxLines: 8,
         maxLength: 1000,
         keyboardType: TextInputType.multiline,
-        decoration: InputDecoration(
-          labelText: label,
-          labelStyle: textBlack,
-          contentPadding: EdgeInsets.all(10),
-          isDense: true,
-        ),
+        prefix: Text(label),
         controller: controller,
-    );
+    ),);
   }
   
 }

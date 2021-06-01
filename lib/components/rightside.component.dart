@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 const backgroundStartColor = Color(0xFFFFFFFF);
-const backgroundEndColor = Color(0xFF702963);
+const backgroundEndColor = Color(0xFF22316C);
 
 class RightSide extends StatelessWidget {
   final ValueListenable<String> page;
@@ -21,7 +21,7 @@ class RightSide extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [backgroundStartColor, backgroundEndColor],
+          colors: [Colors.black.withOpacity(0.02), Colors.black.withOpacity(0.02)],
           stops: [0.0, 1.0]
         )
       ),

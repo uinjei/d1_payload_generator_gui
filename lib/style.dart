@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 const titleText = TextStyle(fontSize: 24, color: Colors.black);
@@ -5,10 +6,10 @@ const textBlack = TextStyle(color: Colors.black);
 const textWhite =TextStyle(color: Colors.white);
 const cardBgGray = Color(0xFFE8E8E8);
 
-final appTheme = ThemeData(
-  fontFamily: 'Varela Round',
-  primaryColor: Colors.purple,
-  elevatedButtonTheme: ElevatedButtonThemeData(
+final cupAppTheme = CupertinoThemeData(
+  //fontFamily: 'Varela Round',
+  /* primaryColor: Colors.purple, */
+  /* elevatedButtonTheme: ElevatedButtonThemeData(
     style: ButtonStyle(backgroundColor: MaterialStateProperty.all<Color>(Colors.purple)),
   ),
   inputDecorationTheme: InputDecorationTheme(
@@ -28,10 +29,10 @@ final appTheme = ThemeData(
     //floatingLabelBehavior: FloatingLabelBehavior.never,
   ),
   iconTheme: IconThemeData(
-    color: Colors.white
+    //color: Colors.white
   ),
   dividerTheme: DividerThemeData(
     thickness: .5,
     space: 0.0,
-  ),
+  ), */
 );

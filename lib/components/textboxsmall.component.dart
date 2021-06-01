@@ -1,5 +1,4 @@
-import 'package:d1_payload_generator_gui/style.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/widgets.dart';
 
 class TextBoxSmall extends StatelessWidget {
@@ -13,19 +12,16 @@ class TextBoxSmall extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
+    return CupertinoFormRow(
+      child: CupertinoTextField(
         enabled: enabled,
+        prefix: Padding(padding: EdgeInsets.only(left: 5, right: 5),
+        child: Text("$label:"),),
         style: TextStyle(
           fontSize: 14
         ),
-        decoration: InputDecoration(
-          labelText: label,
-          labelStyle: textBlack,
-          contentPadding: EdgeInsets.all(10),
-          isDense: true,
-        ),
         controller: controller,
-    );
+    ),);
   }
   
 }

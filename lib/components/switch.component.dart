@@ -1,5 +1,5 @@
 import 'package:d1_payload_generator_gui/style.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/widgets.dart';
 
 class CustomSwitch extends StatelessWidget {
@@ -13,21 +13,24 @@ class CustomSwitch extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      title: Row(
+    return CupertinoFormRow(child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(label, style: textBlack,),
-          Switch(
-            activeColor: Colors.purple,
-            value: value,
-            onChanged: (newValue) {
-              onChanged(newValue);
-            },
+          Transform.scale(
+            scale: 0.6,
+            child: MouseRegion(
+              cursor: SystemMouseCursors.click,
+              child: CupertinoSwitch(
+                value: value,
+                onChanged: (newValue) {
+                  onChanged(newValue);
+                },
+              ),
+            )
           ),
         ],
-      )
-    );
+    ),);
   }
   
 }

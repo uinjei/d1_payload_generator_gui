@@ -3,10 +3,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 final buttonColors = WindowButtonColors(
-  iconNormal: Color(0xFFBF40BF),
-  mouseDown: Color(0xFF702963),
-  mouseOver: Color(0xFFBF40BF),
-  iconMouseDown: Color(0xFFBF40BF),
+  iconNormal: CupertinoColors.activeBlue,
+  mouseDown: Color(0xFF27408B),
+  mouseOver: CupertinoColors.activeBlue,
+  iconMouseDown: CupertinoColors.activeBlue,
   iconMouseOver: Color(0xFFFFFFFF)
 );
 
