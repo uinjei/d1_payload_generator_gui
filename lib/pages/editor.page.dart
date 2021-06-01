@@ -102,17 +102,13 @@ class _EditorPageState extends State<EditorPage> {
     }
   }
 
-  Future<List<Map>> _dirContents(Directory dir) {
-    var m = <Map>[];
-    var completer = Completer<List<Map>>();
+  Future<List<Map>> _dirContents(Directory dir) async {
     final lister = dir.list(recursive: false);
-    lister.listen((file) async {
-      m.add({
-        "metadata": metadata = await _getMeta(file.path),
-        "file": file,
-      });
-    }, onDone: () => completer.complete(m));
-    return completer.future;
+    final mm = lister.map((event) async => {
+      "metadata": metadata = await _getMeta(event.path),
+      "file": event,
+    });
+    return Future.wait(await mm.toList());
   }
 
   _getMeta(path) async => await readFileMeta(path);
