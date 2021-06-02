@@ -36,8 +36,6 @@ class _GeneratePageState extends State<GeneratePage> with TickerProviderStateMix
 
   Generator? gen;
 
-  final _scrollController = ScrollController();
-
   final _bpoIdsController = TextEditingController();
   final _outputFolderController = TextEditingController();
   final _fdLocController = TextEditingController();

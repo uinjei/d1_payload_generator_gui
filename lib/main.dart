@@ -2,17 +2,25 @@ import 'dart:io';
 
 import 'package:d1_payload_generator_gui/components/screen.component.dart';
 import 'package:d1_payload_generator_gui/globals.dart';
+import 'package:d1_payload_generator_gui/services/io.services.dart';
 import 'package:d1_payload_generator_gui/style.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:intl/intl.dart';
 import 'package:logging/logging.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:oktoast/oktoast.dart';
 
-File outputFile = File('app.log');
+File outputFile = File("app.log");
+DateTime today = DateTime.now();
+final df = DateFormat("MM-dd-yyyy");
 
-void main() {
+void main() async {
+  if (df.format(await outputFile.lastModified())!=df.format(today)) {
+    outputFile.copySync("app_${df.format(DateTime.now().subtract(Duration(days: 1)))}.log");
+    outputFile.writeAsString("");
+  }
 
   final logger = Logger('Main');
 

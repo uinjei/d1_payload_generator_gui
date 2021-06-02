@@ -338,7 +338,7 @@ class BuildOrderItems {
           "extensions": {
               "reservationId": "123"//leave as is
           },
-          "quantity": quantity,
+          "quantity": quantity.toString(),
           "productOffering": {
               "id": productOfferingId
           },

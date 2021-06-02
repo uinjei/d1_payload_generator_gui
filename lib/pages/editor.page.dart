@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:ffi';
 import 'dart:io';
 
 import 'package:collection/collection.dart';
@@ -35,6 +36,8 @@ class _EditorPageState extends State<EditorPage> {
   String fdLoc = "";
   bool loading = false;
   List spoNames = [];
+  final duplicateController = TextEditingController();
+  String dupFile = "";
 
   final util = Util();
 
@@ -51,6 +54,7 @@ class _EditorPageState extends State<EditorPage> {
   void initState() {
     super.initState();
     WidgetsBinding.instance!.addPostFrameCallback((_) => _init());
+    duplicateController.addListener(() { dupFile = duplicateController.text; });
   }
 
   @override
@@ -60,6 +64,7 @@ class _EditorPageState extends State<EditorPage> {
         characteristic.dispose();
       });
     });
+    duplicateController.dispose();
     super.dispose();
   }
 
@@ -161,6 +166,12 @@ class _EditorPageState extends State<EditorPage> {
         loading = false;
       });
     });
+  }
+
+  void _duplicatePayload(payload) {
+    final File p = payload["file"];
+    p.copySync("${settingsData[OUTPUT_FOLDER]}/$dupFile.json");
+    duplicateController.text = "";
   }
 
   Future<List<Item>> _generateItems(data) async {
@@ -272,15 +283,88 @@ class _EditorPageState extends State<EditorPage> {
                           ),
                         ],
                       ),
-                      trailing: CupertinoButton(
-                        child: Icon(CupertinoIcons.doc_on_clipboard),
-                        onPressed: () async {
-                          final payload = await readFileContent(p);
-                          Clipboard.setData(
-                              ClipboardData(text: indentJson(payload)));
-                          showToast("Copied to clipboard");
-                        },
-                      ),
+                      trailing: SizedBox(
+                            /* width: 32,
+                            height: 32, */
+                            child: CupertinoContextMenu(
+                              child: Icon(
+                                CupertinoIcons.ellipsis_vertical_circle
+                              ),
+                              actions: <Widget>[
+                                CupertinoContextMenuAction(
+                                  child: Text('Copy to clipboard'),
+                                  onPressed: () async {
+                                    Navigator.pop(context);
+                                    final payload = await readFileContent(p);
+                                    Clipboard.setData(ClipboardData(text: indentJson(payload)));
+                                    showToast("Copied to clipboard");
+                                  },
+                                ),
+                                CupertinoContextMenuAction(
+                                  child: const Text('Copy payload file'),
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                    showCupertinoDialog(context: context, builder: (context) => CupertinoAlertDialog(
+                                  title: Text("Enter name"),
+                                  content: CupertinoTextField(
+                                    controller: duplicateController
+                                  ),
+                                  actions: <Widget>[
+                                    CupertinoDialogAction(
+                                      child: Text("Cancel"),
+                                      onPressed: () => Navigator.of(context).pop(false),
+                                    ),
+                                    CupertinoDialogAction(
+                                      child: Text("Ok"),
+                                      onPressed: () {
+                                        Navigator.of(context).pop(true);
+                                        _duplicatePayload(payloads[index]);
+                                        _init();
+                                        showToast("Payload duplicated");
+                                      },
+                                    ),
+                                  ],
+                                ));
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                          /* CupertinoButton(
+                            child: Icon(CupertinoIcons.doc_on_clipboard),
+                              onPressed: () async {
+                                final payload = await readFileContent(p);
+                                Clipboard.setData(ClipboardData(text: indentJson(payload)));
+                                showToast("Copied to clipboard");
+                            },
+                          ), */
+                         /*  CupertinoButton(
+                            child: Icon(CupertinoIcons.doc_on_clipboard),
+                              onPressed: () async {
+                                showCupertinoDialog(context: context, builder: (context) => CupertinoAlertDialog(
+                                  title: Text("Enter name"),
+                                  content: CupertinoTextField(
+                                    controller: duplicateController
+                                  ),
+                                  actions: <Widget>[
+                                    CupertinoDialogAction(
+                                      child: Text("Cancel"),
+                                      onPressed: () => Navigator.of(context).pop(false),
+                                    ),
+                                    CupertinoDialogAction(
+                                      child: Text("Ok"),
+                                      onPressed: () {
+                                        Navigator.of(context).pop(true);
+                                        _duplicatePayload(payloads[index]);
+                                        _init();
+                                        showToast("Payload duplicated");
+                                      },
+                                    ),
+                                  ],
+                                ));
+                                //showToast("Copied to clipboard");
+                            },
+                          ), */
                       onTap: () => _getSelectedPayload(
                           payloads[index]["file"].path, index),
                     ),
