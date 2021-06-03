@@ -255,7 +255,11 @@ class _EditorPageState extends State<EditorPage> {
             decoration: BoxDecoration(
               color: Colors.white,
             ),
-            child: ListView.builder(
+            child: payloads.isEmpty?Container(
+                  alignment: Alignment.center,
+                  child: Text("Output folder is empty"),
+                  height: 500,
+                ) : ListView.builder(
                 itemCount: payloads.length,
                 controller: _scrollController,
                 itemBuilder: (context, index) {
@@ -277,8 +281,7 @@ class _EditorPageState extends State<EditorPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(path, style: TextStyle(fontSize: 10)),
-                          Text(
-                            '${metadata["currency"]} | ${metadata["timing"]} | ${metadata["proration"]}',
+                          Text('${metadata["currency"]} | ${metadata["timing"]} | ${metadata["proration"]}',
                             style: TextStyle(fontSize: 12),
                           ),
                         ],
@@ -287,12 +290,41 @@ class _EditorPageState extends State<EditorPage> {
                             /* width: 32,
                             height: 32, */
                             child: CupertinoContextMenu(
+                              previewBuilder: (context, animation, widget) =>
+                                FittedBox(
+                                  fit: BoxFit.cover,
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(10.0 * animation.value),
+                                    child: Container(
+                                      decoration: BoxDecoration(color: Colors.white),
+                                      padding: EdgeInsets.all(20),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text("Choose Action For:"),
+                                          SizedBox(height: 5,),
+                                          Text(metadata["name"]),
+                                          Text(path, style: TextStyle(fontSize: 10)),
+                                          Text('${metadata["currency"]} | ${metadata["timing"]} | ${metadata["proration"]}',
+                                            style: TextStyle(fontSize: 12),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
                               child: Icon(
                                 CupertinoIcons.ellipsis_vertical_circle
                               ),
                               actions: <Widget>[
                                 CupertinoContextMenuAction(
-                                  child: Text('Copy to clipboard'),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text('Copy to clipboard'),
+                                      Icon(CupertinoIcons.doc_on_clipboard, color: CupertinoColors.black,),
+                                    ],
+                                  ),
                                   onPressed: () async {
                                     Navigator.pop(context);
                                     final payload = await readFileContent(p);
@@ -301,7 +333,13 @@ class _EditorPageState extends State<EditorPage> {
                                   },
                                 ),
                                 CupertinoContextMenuAction(
-                                  child: const Text('Copy payload file'),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text('Copy payload file'),
+                                      Icon(CupertinoIcons.doc_on_doc, color: CupertinoColors.black,)
+                                    ],
+                                  ),
                                   onPressed: () {
                                     Navigator.pop(context);
                                     showCupertinoDialog(context: context, builder: (context) => CupertinoAlertDialog(
