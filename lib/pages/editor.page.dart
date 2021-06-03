@@ -287,122 +287,83 @@ class _EditorPageState extends State<EditorPage> {
                         ],
                       ),
                       trailing: SizedBox(
-                            /* width: 32,
-                            height: 32, */
-                            child: CupertinoContextMenu(
-                              previewBuilder: (context, animation, widget) =>
-                                FittedBox(
-                                  fit: BoxFit.cover,
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(10.0 * animation.value),
-                                    child: Container(
-                                      decoration: BoxDecoration(color: Colors.white),
-                                      padding: EdgeInsets.all(20),
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Text("Choose Action For:"),
-                                          SizedBox(height: 5,),
-                                          Text(metadata["name"]),
-                                          Text(path, style: TextStyle(fontSize: 10)),
-                                          Text('${metadata["currency"]} | ${metadata["timing"]} | ${metadata["proration"]}',
-                                            style: TextStyle(fontSize: 12),
-                                          ),
-                                        ],
+                        child: CupertinoContextMenu(
+                          previewBuilder: (context, animation, widget) =>
+                            FittedBox(
+                              fit: BoxFit.cover,
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(10.0 * animation.value),
+                                child: Container(
+                                  decoration: BoxDecoration(color: Colors.white),
+                                  padding: EdgeInsets.all(20),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text("Choose Action For:"),
+                                      SizedBox(height: 5,),
+                                      Text(metadata["name"]),
+                                      Text(path, style: TextStyle(fontSize: 10)),
+                                      Text('${metadata["currency"]} | ${metadata["timing"]} | ${metadata["proration"]}',
+                                        style: TextStyle(fontSize: 12),
                                       ),
-                                    ),
+                                    ],
                                   ),
                                 ),
-                              child: Icon(
-                                CupertinoIcons.ellipsis_vertical_circle
                               ),
-                              actions: <Widget>[
-                                CupertinoContextMenuAction(
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text('Copy to clipboard'),
-                                      Icon(CupertinoIcons.doc_on_clipboard, color: CupertinoColors.black,),
-                                    ],
-                                  ),
-                                  onPressed: () async {
-                                    Navigator.pop(context);
-                                    final payload = await readFileContent(p);
-                                    Clipboard.setData(ClipboardData(text: indentJson(payload)));
-                                    showToast("Copied to clipboard");
-                                  },
-                                ),
-                                CupertinoContextMenuAction(
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text('Copy payload file'),
-                                      Icon(CupertinoIcons.doc_on_doc, color: CupertinoColors.black,)
-                                    ],
-                                  ),
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                    showCupertinoDialog(context: context, builder: (context) => CupertinoAlertDialog(
-                                  title: Text("Enter name"),
-                                  content: CupertinoTextField(
-                                    controller: duplicateController
-                                  ),
-                                  actions: <Widget>[
-                                    CupertinoDialogAction(
-                                      child: Text("Cancel"),
-                                      onPressed: () => Navigator.of(context).pop(false),
-                                    ),
-                                    CupertinoDialogAction(
-                                      child: Text("Ok"),
-                                      onPressed: () {
-                                        Navigator.of(context).pop(true);
-                                        _duplicatePayload(payloads[index]);
-                                        _init();
-                                        showToast("Payload duplicated");
-                                      },
-                                    ),
-                                  ],
-                                ));
-                                  },
-                                ),
-                              ],
                             ),
-                          ),
-                          /* CupertinoButton(
-                            child: Icon(CupertinoIcons.doc_on_clipboard),
+                          child: Icon(CupertinoIcons.ellipsis_vertical_circle, color: CupertinoColors.black,),
+                          actions: <Widget>[
+                            CupertinoContextMenuAction(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text('Copy to clipboard'),
+                                  Icon(CupertinoIcons.doc_on_clipboard, color: CupertinoColors.black,),
+                                ],
+                              ),
                               onPressed: () async {
+                                Navigator.pop(context);
                                 final payload = await readFileContent(p);
                                 Clipboard.setData(ClipboardData(text: indentJson(payload)));
                                 showToast("Copied to clipboard");
-                            },
-                          ), */
-                         /*  CupertinoButton(
-                            child: Icon(CupertinoIcons.doc_on_clipboard),
-                              onPressed: () async {
+                              },
+                            ),
+                            CupertinoContextMenuAction(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text('Copy payload file'),
+                                  Icon(CupertinoIcons.doc_on_doc, color: CupertinoColors.black,)
+                                ],
+                              ),
+                              onPressed: () {
+                                Navigator.pop(context);
                                 showCupertinoDialog(context: context, builder: (context) => CupertinoAlertDialog(
-                                  title: Text("Enter name"),
-                                  content: CupertinoTextField(
-                                    controller: duplicateController
-                                  ),
-                                  actions: <Widget>[
-                                    CupertinoDialogAction(
-                                      child: Text("Cancel"),
-                                      onPressed: () => Navigator.of(context).pop(false),
-                                    ),
-                                    CupertinoDialogAction(
-                                      child: Text("Ok"),
-                                      onPressed: () {
-                                        Navigator.of(context).pop(true);
-                                        _duplicatePayload(payloads[index]);
-                                        _init();
-                                        showToast("Payload duplicated");
-                                      },
-                                    ),
-                                  ],
-                                ));
-                                //showToast("Copied to clipboard");
-                            },
-                          ), */
+                              title: Text("Enter name"),
+                              content: CupertinoTextField(
+                                controller: duplicateController
+                              ),
+                              actions: <Widget>[
+                                CupertinoDialogAction(
+                                  child: Text("Cancel"),
+                                  onPressed: () => Navigator.of(context).pop(false),
+                                ),
+                                CupertinoDialogAction(
+                                  child: Text("Ok"),
+                                  onPressed: () {
+                                    Navigator.of(context).pop(true);
+                                    _duplicatePayload(payloads[index]);
+                                    _init();
+                                    showToast("Payload duplicated");
+                                  },
+                                ),
+                              ],
+                            ));
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
                       onTap: () => _getSelectedPayload(
                           payloads[index]["file"].path, index),
                     ),
@@ -456,22 +417,42 @@ class _EditorPageState extends State<EditorPage> {
                                   },
                                   body: ListTile(
                                     dense: true,
-                                    title: value.expandedValue,
-                                    trailing: MouseRegion(
-                                      cursor: SystemMouseCursors.click,
-                                      child: CupertinoButton(
-                                          child:
-                                              Icon(CupertinoIcons.doc_on_doc),
-                                          onPressed: () async {
-                                            orderItems.add(orderItems[index]);
-                                            await _saveOnChanged();
-                                            _getSelectedPayload(
-                                                payloads[selectedIndex]["file"]
-                                                    .path,
-                                                selectedIndex);
-                                            showToast("Order Item duplicated");
-                                          }),
+                                    title: Row(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        MouseRegion(
+                                          cursor: SystemMouseCursors.click,
+                                          child: CupertinoButton(
+                                            child:Icon(CupertinoIcons.doc_on_doc, color: CupertinoColors.black,),
+                                            onPressed: () async {
+                                              orderItems.add(orderItems[index]);
+                                              await _saveOnChanged();
+                                              _getSelectedPayload(
+                                                  payloads[selectedIndex]["file"]
+                                                      .path,
+                                                  selectedIndex);
+                                              showToast("Order Item duplicated");
+                                            }
+                                          ),
+                                        ),
+                                        MouseRegion(
+                                          cursor: SystemMouseCursors.click,
+                                          child: CupertinoButton(
+                                            child:Icon(CupertinoIcons.trash, color: CupertinoColors.black,),
+                                            onPressed: () async {
+                                              orderItems.removeAt(index);
+                                              await _saveOnChanged();
+                                              _getSelectedPayload(
+                                                  payloads[selectedIndex]["file"]
+                                                      .path,
+                                                  selectedIndex);
+                                              showToast("Order Item deleted");
+                                            }
+                                          ),
+                                        ),
+                                      ],
                                     ),
+                                    subtitle: value.expandedValue,
                                   ),
                                   isExpanded: value.isExpanded,
                                 );
