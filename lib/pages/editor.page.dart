@@ -7,6 +7,7 @@ import 'package:collection/collection.dart';
 import 'package:cupertino_list_tile/cupertino_list_tile.dart';
 import 'package:d1_payload_generator_gui/components/customdivider.component.dart';
 import 'package:d1_payload_generator_gui/components/textboxsmall.component.dart';
+import 'package:d1_payload_generator_gui/components/textboxwithbutton.component.dart';
 import 'package:d1_payload_generator_gui/utils/util.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
@@ -41,8 +42,7 @@ class _EditorPageState extends State<EditorPage> {
 
   final util = Util();
 
-  List<List<TextEditingController>> characteristicControllers =
-      List.empty(growable: true);
+  List<List<TextEditingController>> characteristicControllers = List.empty(growable: true);
 
   String selectedPayloadPath = "";
   Map metadata = {};
@@ -71,8 +71,7 @@ class _EditorPageState extends State<EditorPage> {
   Future<void> _saveOnChanged() async {
     data["orderItem"][0]["orderItem"] = orderItems;
     await savePayload(selectedPayloadPath,
-            '/**$PREF_META${json.encode(metadata)}**/\n${indentJson(data)}')
-        .whenComplete(() => setState(() {
+            '/**$PREF_META${json.encode(metadata)}**/\n${indentJson(data)}').whenComplete(() => setState(() {
               //_progressText = "Settings updated.";
             }));
   }
@@ -100,8 +99,7 @@ class _EditorPageState extends State<EditorPage> {
     for (var i = 0; i < characteristicControllers.length; i++) {
       List c = characteristicControllers[i];
       for (var j = 0; j < c.length; j++) {
-        final charValue =
-            orderItems[i]["product"]["characteristic"][j]["value"];
+        final charValue = orderItems[i]["product"]["characteristic"][j]["value"];
         c[j].text = charValue is String ? charValue : charValue.toString();
       }
     }
@@ -118,16 +116,16 @@ class _EditorPageState extends State<EditorPage> {
 
   _getMeta(path) async => await readFileMeta(path);
 
-  void _getSelectedPayload(path, index) async {
+  _getSelectedPayload(path, index) async {
     setState(() {
       loading = true;
+      selectedIndex = index;
     });
 
     data = await readFileContent(path);
     final meta = await readFileMeta(path);
     orderItems = data["orderItem"][0]["orderItem"];
-    orderItems.sort((a, b) =>
-        a["productOffering"]["id"].compareTo(b["productOffering"]["id"]));
+    orderItems.sort((a, b) => a["productOffering"]["id"].compareTo(b["productOffering"]["id"]));
     final grouped = orderItems.groupListsBy((element) => element["productOffering"]["id"]);
 
     characteristicControllers = List.empty(growable: true);
@@ -140,26 +138,19 @@ class _EditorPageState extends State<EditorPage> {
         final k = e.key;
         final v = e.value;
         if (v["productOfferingGroupOption"] != null) {
-          final bpoLoc = util.generateJSONFileLocation(
-              PRODUCT_OFFERING_FOLDER, meta["id"]);
-          final offerGroupName =
-              (await readFile(bpoLoc))["bundledProdOfferGroupOption"]
-                  .firstWhere((e) =>
-                      e["groupOptionId"] ==
-                      v["productOfferingGroupOption"]["groupOptionId"])["name"]
+          final bpoLoc = util.generateJSONFileLocation(PRODUCT_OFFERING_FOLDER, meta["id"]);
+          final offerGroupName = (await readFile(bpoLoc))["bundledProdOfferGroupOption"]
+                  .firstWhere((e) => e["groupOptionId"] == v["productOfferingGroupOption"]["groupOptionId"])["name"]
                   .firstWhere((e) => e["locale"] == LOCALE)["value"];
           return "$offerGroupName ${isSingle ? "" : k + 1}";
         }
         return "${await _getOfferDetails(value[k]["productOffering"]["id"])} ${isSingle ? "" : k + 1}";
       }));
-    })))
-        .expand((element) => element)
-        .toList();
+    }))).expand((element) => element).toList();
 
     _generateItems(orderItems).then((value) {
       setState(() {
         expandedData = value;
-        selectedIndex = index;
       });
     }).whenComplete(() {
       setState(() {
@@ -184,8 +175,7 @@ class _EditorPageState extends State<EditorPage> {
         TextEditingController characteristicController;
         characteristicController = TextEditingController();
         characteristicController.addListener(() {
-          orderItem["product"]["characteristic"][i]["value"] =
-              characteristicController.text;
+          orderItem["product"]["characteristic"][i]["value"] = characteristicController.text;
           _saveOnChanged();
         });
         c.add(characteristicController);
@@ -201,44 +191,70 @@ class _EditorPageState extends State<EditorPage> {
             child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              "Extensions",
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            Text(
-              "ReservationId: ${orderItem["extensions"]["reservationId"]}",
-            ),
+            Text("Extensions",style: TextStyle(fontWeight: FontWeight.bold),),
+            Text("ReservationId: ${orderItem["extensions"]["reservationId"]}",),
             CustomDivider(),
             Text("Quantity: ${orderItem["quantity"]}"),
             CustomDivider(),
-            Text(
-              "Product Offering",
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
+            Text("Product Offering",style: TextStyle(fontWeight: FontWeight.bold),),
             Text("Id: ${orderItem["productOffering"]["id"]}"),
             CustomDivider(),
             Text("Action: ${orderItem["action"]}"),
             CustomDivider(),
-            ...generateListedProperties(
-                orderItem["modifyReason"], "Modify Reason"),
+            ...generateListedProperties(orderItem["modifyReason"], "Modify Reason"),
             CustomDivider(),
-            ...generateListedProperties(
-                orderItem["externalIdentifier"], "External Identifier"),
+            ...generateListedProperties(orderItem["externalIdentifier"], "External Identifier"),
             CustomDivider(),
-            Text(
-              "Product",
-              style: TextStyle(fontWeight: FontWeight.bold),
+            Text("Product", style: TextStyle(fontWeight: FontWeight.bold),
             ),
-            Text(
-              "Product Specification",
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
+            Text("Product Specification", style: TextStyle(fontWeight: FontWeight.bold),),
             Text("Id: ${orderItem["product"]["productSpecification"]["id"]}"),
-            ...generateListedTextBoxProperties(
-                orderItem["product"]["characteristic"], "Characteristic", c),
+            ...generateListedTextBoxProperties(orderItem["product"]["characteristic"], "Characteristic", c),
             ...generateListedProperties(orderItem["product"]["place"], "Place"),
           ],
         )),
+      );
+    });
+  }
+  
+  Future<void> deleteChar(list, controllers, index) {
+    _logger.info("char index>>> " + index.toString());
+    _logger.info("char>>> " + list[index].toString());
+    //final niremove = controllers.removeAt(index);
+    //_logger.info("niremove>>> " + niremove.text);
+    //niremove.dispose();
+    list.removeAt(index);
+    return Future.value(true);
+  }
+
+  List<Widget> generateListedTextBoxProperties(List<dynamic> list, String parent, List<TextEditingController> controllers) {
+    if (list.isEmpty) return [];
+
+    final isSingle = list.length == 1;
+
+    return List.generate(list.length, (index) {
+      final title = "${ReCase(list[index]["name"]).titleCase}";
+
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "$parent ${isSingle ? "" : index + 1}",
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          TextBoxSmall(
+            label: title,
+            controller: controllers[index],
+            enabled: title != "Equipment Group",
+            /* icon: Icon(CupertinoIcons.trash, color: CupertinoColors.black,),
+            onPressed: () async {
+              await deleteChar(list, controllers, index);
+              await _saveOnChanged();
+              _getSelectedPayload(payloads[selectedIndex]["file"].path, selectedIndex);
+              showToast("Characteristic deleted");
+            }, */
+          ),
+        ],
       );
     });
   }
@@ -267,16 +283,10 @@ class _EditorPageState extends State<EditorPage> {
                   final path = p.split("\\").last;
                   final metadata = payloads[index]["metadata"];
                   return DecoratedBox(
-                    decoration: BoxDecoration(
-                      color: selectedIndex == index
-                          ? Colors.black.withOpacity(0.03)
-                          : Colors.white,
-                    ),
+                    decoration: BoxDecoration(color: selectedIndex == index?Colors.black.withOpacity(0.03):Colors.white),
                     child: CupertinoListTile(
                       hoverColor: Colors.black.withOpacity(0.03),
-                      title: Text(
-                        metadata["name"],
-                      ),
+                      title: Text(metadata["name"]),
                       subtitle: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -364,8 +374,7 @@ class _EditorPageState extends State<EditorPage> {
                           ],
                         ),
                       ),
-                      onTap: () => _getSelectedPayload(
-                          payloads[index]["file"].path, index),
+                      onTap: () => _getSelectedPayload(payloads[index]["file"].path, index),
                     ),
                   );
                 }),
@@ -427,10 +436,7 @@ class _EditorPageState extends State<EditorPage> {
                                             onPressed: () async {
                                               orderItems.add(orderItems[index]);
                                               await _saveOnChanged();
-                                              _getSelectedPayload(
-                                                  payloads[selectedIndex]["file"]
-                                                      .path,
-                                                  selectedIndex);
+                                              _getSelectedPayload(payloads[selectedIndex]["file"].path, selectedIndex);
                                               showToast("Order Item duplicated");
                                             }
                                           ),
@@ -442,10 +448,7 @@ class _EditorPageState extends State<EditorPage> {
                                             onPressed: () async {
                                               orderItems.removeAt(index);
                                               await _saveOnChanged();
-                                              _getSelectedPayload(
-                                                  payloads[selectedIndex]["file"]
-                                                      .path,
-                                                  selectedIndex);
+                                              _getSelectedPayload(payloads[selectedIndex]["file"].path, selectedIndex);
                                               showToast("Order Item deleted");
                                             }
                                           ),
@@ -501,32 +504,6 @@ List<Widget> generateListedProperties(List<dynamic>? list, String parent) {
                       "${ReCase(nameSet[ind]).titleCase}: ${list[index][nameSet[ind]]}"))
             ],
           ));
-}
-
-List<Widget> generateListedTextBoxProperties(List<dynamic> list, String parent,
-    List<TextEditingController> controllers) {
-  if (list.isEmpty) return [];
-
-  final isSingle = list.length == 1;
-
-  return List.generate(list.length, (index) {
-    final title = "${ReCase(list[index]["name"]).titleCase}";
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          "$parent ${isSingle ? "" : index + 1}",
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        TextBoxSmall(
-          label: title,
-          controller: controllers[index],
-          enabled: title != "Equipment Group",
-        ),
-      ],
-    );
-  });
 }
 
 class ListTileCursor extends MaterialStateMouseCursor {

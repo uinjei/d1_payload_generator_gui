@@ -190,10 +190,16 @@ class _GeneratePageState extends State<GeneratePage> with TickerProviderStateMix
                   backgroundColor: Colors.transparent,
                   children: [
                     MultilineTextBox(label: "BPO IDs", controller: _bpoIdsController),
-                    TextBoxWithButton(label: "FD Location", controller: _fdLocController,
-                      icon: Icon(CupertinoIcons.folder_open, color: CupertinoColors.black,), onPressed: _browseFD),
-                    TextBoxWithButton(label: "Output Folder", controller: _outputFolderController,
-                      icon: Icon(CupertinoIcons.folder_open, color: CupertinoColors.black,), onPressed: _browseOutputFolder),
+                    TextBoxWithButton(
+                      label: "FD Location",
+                      controller: _fdLocController,
+                      icon: Icon(CupertinoIcons.folder_open, color: CupertinoColors.black,),
+                      onPressed: _browseFD),
+                    TextBoxWithButton(
+                      label: "Output Folder",
+                      controller: _outputFolderController,
+                      icon: Icon(CupertinoIcons.folder_open, color: CupertinoColors.black,),
+                      onPressed: _browseOutputFolder),
                     CustomSwitch(label: "Pretty", value: _pretty, onChanged: prettyOnChanged),
                     CustomSwitch(label: "Allow Random Qty", value: _allowRandomQty, onChanged: alloRandomQtyOnChanged),
                     CustomSwitch(label: "Include All SPO", value: _includeAllSpo, onChanged: includeAllSpoOnChanged),

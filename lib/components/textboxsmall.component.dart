@@ -15,8 +15,10 @@ class TextBoxSmall extends StatelessWidget {
     return CupertinoFormRow(
       child: CupertinoTextField(
         enabled: enabled,
-        prefix: Padding(padding: EdgeInsets.only(left: 5, right: 5),
-        child: Text("$label:"),),
+        prefix: Padding(
+          padding: EdgeInsets.only(left: 5, right: 5),
+          child: Text("$label:"),
+        ),
         style: TextStyle(
           fontSize: 14
         ),
