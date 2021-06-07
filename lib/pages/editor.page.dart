@@ -40,6 +40,8 @@ class _EditorPageState extends State<EditorPage> {
   final duplicateController = TextEditingController();
   String dupFile = "";
 
+  bool isDeletingCharacter = false;
+
   final util = Util();
 
   List<List<TextEditingController>> characteristicControllers = List.empty(growable: true);
@@ -175,6 +177,11 @@ class _EditorPageState extends State<EditorPage> {
         TextEditingController characteristicController;
         characteristicController = TextEditingController();
         characteristicController.addListener(() {
+          /* this will disregard the listener when deleting characteristic */
+          if (isDeletingCharacter) {
+            isDeletingCharacter = false;
+            return;
+          }
           orderItem["product"]["characteristic"][i]["value"] = characteristicController.text;
           _saveOnChanged();
         });
@@ -217,12 +224,8 @@ class _EditorPageState extends State<EditorPage> {
     });
   }
   
-  Future<void> deleteChar(list, controllers, index) {
-    _logger.info("char index>>> " + index.toString());
-    _logger.info("char>>> " + list[index].toString());
-    //final niremove = controllers.removeAt(index);
-    //_logger.info("niremove>>> " + niremove.text);
-    //niremove.dispose();
+  Future<void> deleteChar(list, List<TextEditingController> controllers, index) {
+    controllers.removeAt(index);
     list.removeAt(index);
     return Future.value(true);
   }
@@ -242,17 +245,18 @@ class _EditorPageState extends State<EditorPage> {
             "$parent ${isSingle ? "" : index + 1}",
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
-          TextBoxSmall(
+          TextBoxSmallWithButton(
             label: title,
             controller: controllers[index],
             enabled: title != "Equipment Group",
-            /* icon: Icon(CupertinoIcons.trash, color: CupertinoColors.black,),
+            icon: Icon(CupertinoIcons.trash, color: CupertinoColors.black,),
             onPressed: () async {
+              isDeletingCharacter = true;
               await deleteChar(list, controllers, index);
               await _saveOnChanged();
               _getSelectedPayload(payloads[selectedIndex]["file"].path, selectedIndex);
               showToast("Characteristic deleted");
-            }, */
+            },
           ),
         ],
       );
