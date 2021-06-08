@@ -198,26 +198,40 @@ class _EditorPageState extends State<EditorPage> {
             child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Extensions",style: TextStyle(fontWeight: FontWeight.bold),),
-            Text("ReservationId: ${orderItem["extensions"]["reservationId"]}",),
+            /* Text("Extensions",style: TextStyle(fontWeight: FontWeight.bold),),
+            Text("ReservationId: ${orderItem["extensions"]["reservationId"]}",), */
             CustomDivider(),
-            Text("Quantity: ${orderItem["quantity"]}"),
+            Row(
+              children: [
+                Text("Quantity: ", style: TextStyle(fontWeight: FontWeight.bold)),
+                Text(orderItem["quantity"]),
+              ],
+            ),
             CustomDivider(),
-            Text("Product Offering",style: TextStyle(fontWeight: FontWeight.bold),),
-            Text("Id: ${orderItem["productOffering"]["id"]}"),
+            Row(
+              children: [
+                Text("Product Offering Id: ",style: TextStyle(fontWeight: FontWeight.bold)),
+                Text(orderItem["productOffering"]["id"]),
+              ],
+            ),
+            // CustomDivider(),
+            // Text("Action: ${orderItem["action"]}"),
             CustomDivider(),
-            Text("Action: ${orderItem["action"]}"),
-            CustomDivider(),
-            ...generateListedProperties(orderItem["modifyReason"], "Modify Reason"),
-            CustomDivider(),
+            // ...generateListedProperties(orderItem["modifyReason"], "Modify Reason"),
+            // CustomDivider(),
             ...generateListedProperties(orderItem["externalIdentifier"], "External Identifier"),
             CustomDivider(),
-            Text("Product", style: TextStyle(fontWeight: FontWeight.bold),
+            Row(
+              children: [
+                Text("Product Specification Id: ", style: TextStyle(fontWeight: FontWeight.bold),),
+                Text(orderItem["product"]["productSpecification"]["id"]),
+              ],
             ),
-            Text("Product Specification", style: TextStyle(fontWeight: FontWeight.bold),),
-            Text("Id: ${orderItem["product"]["productSpecification"]["id"]}"),
+            orderItem["product"]["characteristic"].isNotEmpty?
+              Text("Characteristics:", style: TextStyle(fontWeight: FontWeight.bold))
+              :Text("No Characteristics Defined", style: TextStyle(fontWeight: FontWeight.bold)),
             ...generateListedTextBoxProperties(orderItem["product"]["characteristic"], "Characteristic", c),
-            ...generateListedProperties(orderItem["product"]["place"], "Place"),
+            // ...generateListedProperties(orderItem["product"]["place"], "Place"),
           ],
         )),
       );
@@ -237,19 +251,20 @@ class _EditorPageState extends State<EditorPage> {
 
     return List.generate(list.length, (index) {
       final title = "${ReCase(list[index]["name"]).titleCase}";
+      final enabled = title!="Equipment Group";
 
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
+          /* Text(
             "$parent ${isSingle ? "" : index + 1}",
             style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-          TextBoxSmallWithButton(
+          ),*/
+         TextBoxSmallWithButton(
             label: title,
             controller: controllers[index],
-            enabled: title != "Equipment Group",
-            icon: Icon(CupertinoIcons.trash, color: CupertinoColors.black,),
+            enabled: enabled,
+            icon: Icon(CupertinoIcons.trash, color: enabled?CupertinoColors.black:CupertinoColors.inactiveGray),
             onPressed: () async {
               isDeletingCharacter = true;
               await deleteChar(list, controllers, index);
@@ -265,7 +280,7 @@ class _EditorPageState extends State<EditorPage> {
 
   @override
   Widget build(BuildContext context) {
-    payloads.removeWhere((element) => element["file"].path.contains("error-"));
+    //payloads.removeWhere((element) => element["file"].path.contains("error-"));
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -289,6 +304,7 @@ class _EditorPageState extends State<EditorPage> {
                   return DecoratedBox(
                     decoration: BoxDecoration(color: selectedIndex == index?Colors.black.withOpacity(0.03):Colors.white),
                     child: CupertinoListTile(
+                      //contentPadding: EdgeInsets.all(0),
                       hoverColor: Colors.black.withOpacity(0.03),
                       title: Text(metadata["name"]),
                       subtitle: Column(
@@ -296,7 +312,7 @@ class _EditorPageState extends State<EditorPage> {
                         children: [
                           Text(path, style: TextStyle(fontSize: 10)),
                           Text('${metadata["currency"]} | ${metadata["timing"]} | ${metadata["proration"]}',
-                            style: TextStyle(fontSize: 12),
+                            style: TextStyle(fontSize: 12, color: CupertinoColors.inactiveGray),
                           ),
                         ],
                       ),
@@ -313,12 +329,10 @@ class _EditorPageState extends State<EditorPage> {
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      Text("Choose Action For:"),
-                                      SizedBox(height: 5,),
                                       Text(metadata["name"]),
                                       Text(path, style: TextStyle(fontSize: 10)),
                                       Text('${metadata["currency"]} | ${metadata["timing"]} | ${metadata["proration"]}',
-                                        style: TextStyle(fontSize: 12),
+                                        style: TextStyle(fontSize: 12, color: CupertinoColors.inactiveGray),
                                       ),
                                     ],
                                   ),
@@ -328,12 +342,15 @@ class _EditorPageState extends State<EditorPage> {
                           child: Icon(CupertinoIcons.ellipsis_vertical_circle, color: CupertinoColors.black,),
                           actions: <Widget>[
                             CupertinoContextMenuAction(
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text('Copy to clipboard'),
-                                  Icon(CupertinoIcons.doc_on_clipboard, color: CupertinoColors.black,),
-                                ],
+                              child: MouseRegion(
+                                cursor: SystemMouseCursors.click,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text('Copy to clipboard'),
+                                    Icon(CupertinoIcons.doc_on_clipboard, color: CupertinoColors.black,),
+                                  ],
+                                ),
                               ),
                               onPressed: () async {
                                 Navigator.pop(context);
@@ -343,12 +360,15 @@ class _EditorPageState extends State<EditorPage> {
                               },
                             ),
                             CupertinoContextMenuAction(
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text('Copy payload file'),
-                                  Icon(CupertinoIcons.doc_on_doc, color: CupertinoColors.black,)
-                                ],
+                              child: MouseRegion(
+                                cursor: SystemMouseCursors.click,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text('Copy payload file'),
+                                    Icon(CupertinoIcons.doc_on_doc, color: CupertinoColors.black,)
+                                  ],
+                                ),
                               ),
                               onPressed: () {
                                 Navigator.pop(context);
@@ -359,11 +379,17 @@ class _EditorPageState extends State<EditorPage> {
                               ),
                               actions: <Widget>[
                                 CupertinoDialogAction(
-                                  child: Text("Cancel"),
+                                  child: MouseRegion(
+                                    cursor: SystemMouseCursors.click,
+                                    child: Text("Cancel"),
+                                  ),
                                   onPressed: () => Navigator.of(context).pop(false),
                                 ),
                                 CupertinoDialogAction(
-                                  child: Text("Ok"),
+                                  child: MouseRegion(
+                                    cursor: SystemMouseCursors.click,
+                                    child: Text("Ok"),
+                                  ),
                                   onPressed: () {
                                     Navigator.of(context).pop(true);
                                     _duplicatePayload(payloads[index]);
@@ -436,7 +462,10 @@ class _EditorPageState extends State<EditorPage> {
                                         MouseRegion(
                                           cursor: SystemMouseCursors.click,
                                           child: CupertinoButton(
-                                            child:Icon(CupertinoIcons.doc_on_doc, color: CupertinoColors.black,),
+                                            padding: EdgeInsets.zero,
+                                            child: Transform.scale(
+                                              scale: 0.6,
+                                              child: Icon(CupertinoIcons.doc_on_doc, color: CupertinoColors.black)),
                                             onPressed: () async {
                                               orderItems.add(orderItems[index]);
                                               await _saveOnChanged();
@@ -448,7 +477,10 @@ class _EditorPageState extends State<EditorPage> {
                                         MouseRegion(
                                           cursor: SystemMouseCursors.click,
                                           child: CupertinoButton(
-                                            child:Icon(CupertinoIcons.trash, color: CupertinoColors.black,),
+                                            padding: EdgeInsets.zero,
+                                            child: Transform.scale(
+                                              scale: 0.6,
+                                              child: Icon(CupertinoIcons.trash, color: CupertinoColors.black)),
                                             onPressed: () async {
                                               orderItems.removeAt(index);
                                               await _saveOnChanged();

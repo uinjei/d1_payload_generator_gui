@@ -35,7 +35,6 @@ class TextBoxWithButton extends StatelessWidget {
 }
 
 class TextBoxSmallWithButton extends StatelessWidget {
-
   
   final String label;
   final TextEditingController controller;
@@ -53,9 +52,7 @@ class TextBoxSmallWithButton extends StatelessWidget {
         height: 32,
         child: CupertinoTextField(
         enabled: enabled,
-        style: TextStyle(
-          fontSize: 14
-        ),
+        style: TextStyle(fontSize: 14, color: enabled?CupertinoColors.black:CupertinoColors.inactiveGray),
         controller: controller,
         prefix: Padding(
           padding: EdgeInsets.only(left: 5, right: 5),
