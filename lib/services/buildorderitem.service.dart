@@ -82,6 +82,7 @@ class BuildOrderItems {
           case STRING_TYPE:
               return "Random String";
           case INTEGER_TYPE:
+          case FLOAT_TYPE:
               return generateRandomNumber(1, 100);
       }
   }

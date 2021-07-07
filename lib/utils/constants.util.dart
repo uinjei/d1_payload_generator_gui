@@ -10,6 +10,7 @@ const String BUNDLE_PRODUCT_TYPE = "BUNDLE_PRODUCT_TYPE";
 const String SIMPLE_PRODUCT_TYPE = "SIMPLE_PRODUCT_TYPE";
 const String STRING_TYPE = "String";
 const String INTEGER_TYPE = "Integer";
+const String FLOAT_TYPE = "Float";
 
 const String BPO_IDs = "BPO_IDs";
 const String FD_LOCATION = "FD_LOCATION";
