@@ -27,6 +27,7 @@ class _GeneratePageState extends State<GeneratePage> with TickerProviderStateMix
 
   List _bpoIds = [];
   bool _pretty = true;
+  bool _userPsChars = true;
   bool _allowRandomQty = true;
   bool _includeAllSpo = true;
   bool _offNet3rdPartyProvider = true;
@@ -107,6 +108,12 @@ class _GeneratePageState extends State<GeneratePage> with TickerProviderStateMix
     });
     saveOnChanged();
   }
+   void usePsCharsOnChanged(bool newValue) {
+    setState(() { 
+      _userPsChars = data[USE_PS_CHARS] = newValue; 
+    });
+    saveOnChanged();
+  }
   void alloRandomQtyOnChanged(bool newValue) {
     setState(() { 
       _allowRandomQty = data[ALLOW_RANDOM_QTY] = newValue; 
@@ -135,6 +142,7 @@ class _GeneratePageState extends State<GeneratePage> with TickerProviderStateMix
       _fdLocController.text = data[FD_LOCATION];
       _outputFolderController.text = data[OUTPUT_FOLDER];
       _pretty = data[PRETTY];
+      _userPsChars = data[USE_PS_CHARS];
       _allowRandomQty = data[ALLOW_RANDOM_QTY];
       _includeAllSpo = data[INCLUDE_ALL_SPO];
       _offNet3rdPartyProvider = data[OFF_NET_3RD_PARTY_PROVIDER];
@@ -201,6 +209,7 @@ class _GeneratePageState extends State<GeneratePage> with TickerProviderStateMix
                       icon: Icon(CupertinoIcons.folder_open, color: CupertinoColors.black,),
                       onPressed: _browseOutputFolder),
                     CustomSwitch(label: "Pretty", value: _pretty, onChanged: prettyOnChanged),
+                    CustomSwitch(label: "Use PS Characteristics", value: _userPsChars, onChanged: usePsCharsOnChanged),
                     CustomSwitch(label: "Allow Random Qty", value: _allowRandomQty, onChanged: alloRandomQtyOnChanged),
                     CustomSwitch(label: "Include All SPO", value: _includeAllSpo, onChanged: includeAllSpoOnChanged),
                     CustomSwitch(label: "Off Net 3rd Party Provider", value: _offNet3rdPartyProvider, onChanged: offNet3rdPartyProviderOnChanged),

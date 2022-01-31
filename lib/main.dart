@@ -33,7 +33,7 @@ void main() async {
   runApp(MyApp());
 
   doWhenWindowReady(() {
-    final initialSize = Size(1000, 700);
+    final initialSize = Size(1000, 750);
     appWindow.minSize = initialSize;
     appWindow.size = initialSize;
     appWindow.alignment = Alignment.center;
