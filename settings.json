@@ -1,10 +1,17 @@
 {
-    "FD_LOCATION": "C:\\Users\\user\\d1-provide-payload-generator-master\\FD_env52_20210624",
+    "FD_LOCATION": "C:\\Users\\user\\d1_payload_generator_gui\\FD",
     "BPO_IDs": [
-        "fa600994-1d35-48ea-a9d1-4daf30aa0e17"
+        "bcfe3ffa-30b2-4a80-80ff-3ffc97aa1756",
+        "8dc021c9-d634-4785-8ea9-9ce45e0951f7",
+        "a7173944-30ce-4d09-a389-22ae7c3971be",
+        "8bb03ba9-a222-492e-8b2e-e84224ce473e",
+        "4349b94a-fde9-4c5b-8271-c8b7954d659e",
+        "827d3820-6cba-4e17-968d-868624fdf898",
+        "a17355e9-056c-44b7-bb44-df87bf850b46"
     ],
     "OUTPUT_FOLDER": "C:\\Users\\user\\d1_payload_generator_gui\\generated-provide-payloads",
     "PRETTY": true,
+    "USE_PS_CHARACTERISTICS": false,
     "ALLOW_RANDOM_QTY": false,
     "INCLUDE_ALL_SPO": true,
     "OFF_NET_3RD_PARTY_PROVIDER": false,

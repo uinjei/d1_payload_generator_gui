@@ -29,9 +29,15 @@ class Generator {
       Map priceMap;
 
       if (jsonFile["priceType"] == "RC") {
+
+          final paymentTiming = jsonFile["priceCharacteristic"].firstWhere((result) => result["name"] == "Payment timing");
+          final prorationMethod = jsonFile["priceCharacteristic"].firstWhere((result) => result["name"] == "Proration Method");
+
           priceMap = {
-              "timing": jsonFile["priceCharacteristic"].firstWhere((result) => result["name"] == "Payment timing")["characteristicValue"][0]["value"],
-              "proration": jsonFile["priceCharacteristic"].firstWhere((result) => result["name"] == "Proration Method")["characteristicValue"][0]["value"]
+              "rc" : {
+                 "timing": paymentTiming!=null?paymentTiming["characteristicValue"][0]["value"]:"NO_PAYMENT_TIMING",
+                 "proration": prorationMethod!=null?prorationMethod["characteristicValue"][0]["value"]:"NO_PRORATION_METHOD"
+              }
           };
       }
       else priceMap = {"oc": "OC"};
@@ -41,10 +47,23 @@ class Generator {
     
     final priceCharacteristics = await Future.wait(priceCharacteristic);
     
+    final rc = priceCharacteristics.firstWhere((result) => result["rc"]!=null, orElse: () => Map());
+
+    String paymentTiming = "";
+    String prorationMethod = "";
+
+    if (rc.isNotEmpty) {
+      paymentTiming = rc["rc"]["timing"];
+      prorationMethod = rc["rc"]["proration"];
+    } else {
+      paymentTiming = "NO";
+      prorationMethod = "RC";
+    }
+
     return {
         ...args,
-        "timing": priceCharacteristics.firstWhere((result) => result["timing"]!=null)["timing"],
-        "proration": priceCharacteristics.firstWhere((result) => result["proration"]!=null)["proration"]
+        "timing": paymentTiming,
+        "proration": prorationMethod
     };
   }
 

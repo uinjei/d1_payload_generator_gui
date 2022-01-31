@@ -238,7 +238,9 @@ class BuildOrderItems {
       
       final json = await selectValueFromProductOfferDefinedProductSpecCharValues(productOfferId);
 
-      await selectValueFromProductSpecCharValues(json["productSpecification"]["id"], json["characteristic"], onNetIndicator);
+      /* skip PS characteristics */
+      if (util.usePsChars)
+        await selectValueFromProductSpecCharValues(json["productSpecification"]["id"], json["characteristic"], onNetIndicator);
 
       final itemTerm = [];
       if (json["productOfferingTerm"].length > 0) {

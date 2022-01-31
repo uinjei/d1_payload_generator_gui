@@ -40,6 +40,8 @@ class _EditorPageState extends State<EditorPage> {
   final duplicateController = TextEditingController();
   String dupFile = "";
 
+  Map<String, String> charValueFormat = Map();
+
   bool isDeletingCharacter = false;
 
   final util = Util();
@@ -174,6 +176,13 @@ class _EditorPageState extends State<EditorPage> {
       var c = List<TextEditingController>.empty(growable: true);
 
       for (var i = 0; i < orderItem["product"]["characteristic"].length; i++) {
+        
+        final formatKey = orderItem["product"]["characteristic"][i]["name"];
+
+        /*set characteristic value format*/
+        charValueFormat[formatKey] 
+          = orderItem["product"]["characteristic"][i]["value"].runtimeType.toString();
+
         TextEditingController characteristicController;
         characteristicController = TextEditingController();
         characteristicController.addListener(() {
@@ -182,7 +191,19 @@ class _EditorPageState extends State<EditorPage> {
             isDeletingCharacter = false;
             return;
           }
-          orderItem["product"]["characteristic"][i]["value"] = characteristicController.text;
+          /*format handler */
+          switch (charValueFormat[formatKey]) {
+            case "String":
+              orderItem["product"]["characteristic"][i]["value"] = characteristicController.text;
+              break;
+            case "int":
+              orderItem["product"]["characteristic"][i]["value"] = int.parse(characteristicController.text);
+              break;
+            case "boolean":
+              orderItem["product"]["characteristic"][i]["value"] = characteristicController.text=="true"?true:false;
+              break;
+            default:
+          }
           _saveOnChanged();
         });
         c.add(characteristicController);
